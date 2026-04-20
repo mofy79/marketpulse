@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MarketPulse — Din Daglige Markedsoversigt</title>
+<style>
+:root {
+  --bg:       #080d17;
+  --surf:     #0f1726;
+  --surf2:    #172035;
+  --border:   #1d2e47;
+  --text:     #dde6f5;
+  --dim:      #6b7fa0;
+  --green:    #22c55e;
+  --red:      #f04b4b;
+  --yellow:   #eab308;
+  --blue:     #3b82f6;
+  --gold:     #d97706;
+  --purple:   #a78bfa;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;font-size:13px;min-height:100vh}
+
+/* ── Header ── */
+.hdr{background:var(--surf);border-bottom:1px solid var(--border);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:99;backdrop-filter:blur(6px)}
+.logo{font-size:17px;font-weight:800;letter-spacing:-0.5px;background:linear-gradient(135deg,#60a5fa,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hdr-right{display:flex;gap:14px;align-items:center}
+.upd{color:var(--dim);font-size:11px}
+.btn{background:var(--surf2);border:1px solid var(--border);color:var(--text);padding:5px 12px;border-radius:6px;cursor:pointer;font-size:12px;transition:.2s}
+.btn:hover{background:var(--border)}
+.live{display:inline-block;width:7px;height:7px;background:var(--green);border-radius:50%;margin-right:5px;animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ── Layout ── */
+.wrap{max-width:1640px;margin:0 auto;padding:14px 18px}
+
+/* ── Loading ── */
+.loader{display:flex;align-items:center;justify-content:center;height:80px;gap:6px;color:var(--dim);font-size:13px}
+.dot{width:7px;height:7px;background:var(--blue);border-radius:50%;animation:blink 1.2s infinite}
+.dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
+
+/* ── Bias hero ── */
+.bias-hero{background:linear-gradient(135deg,#0b1120 0%,#131f35 60%,#1a1535 100%);border:1px solid var(--border);border-radius:12px;padding:20px 24px;display:grid;grid-template-columns:160px 1fr auto;gap:24px;align-items:center;margin-bottom:14px}
+.bias-num{text-align:center}
+.bias-lbl{font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.bias-val{font-size:28px;font-weight:900;letter-spacing:-1px}
+.bias-val.BULLISH{color:var(--green)}
+.bias-val.BEARISH{color:var(--red)}
+.bias-val.NEUTRAL{color:var(--yellow)}
+.score-row{margin-top:6px;font-size:12px;display:flex;gap:10px;justify-content:center}
+.rec-text{font-size:13px;line-height:1.55;color:var(--text);margin-bottom:10px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:11px;padding:3px 9px;border-radius:4px;font-weight:600}
+.chip.buy{background:rgba(34,197,94,.13);color:var(--green);border:1px solid rgba(34,197,94,.25)}
+.chip.sell{background:rgba(240,75,75,.13);color:var(--red);border:1px solid rgba(240,75,75,.25)}
+.port-col{min-width:170px}
+.port-lbl{font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.port-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);gap:8px}
+.port-name{font-size:11px;color:var(--dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:110px}
+.badge{font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;white-space:nowrap}
+.badge.buy{background:rgba(34,197,94,.15);color:var(--green)}
+.badge.sell{background:rgba(240,75,75,.15);color:var(--red)}
+
+/* ── Pulse row ── */
+.pulse-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.pulse-card{background:var(--surf);border:1px solid var(--border);border-radius:8px;padding:12px 14px}
+.p-lbl{font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.p-val{font-size:22px;font-weight:700;letter-spacing:-.5px;line-height:1}
+.p-sub{font-size:11px;color:var(--dim);margin-top:3px}
+.fg-bar{position:relative;height:6px;background:linear-gradient(to right,#ef4444,#eab308,#22c55e);border-radius:3px;margin:6px 0 2px}
+.fg-pin{position:absolute;width:3px;height:12px;background:#fff;border-radius:2px;top:-3px;transform:translateX(-50%);box-shadow:0 0 5px rgba(0,0,0,.6)}
+
+/* ── Section header ── */
+.sec{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1.2px;color:var(--dim);margin:18px 0 8px}
+
+/* ── Grid layouts ── */
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px}
+.g2{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:10px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px}
+
+/* ── Market region card ── */
+.region{background:var(--surf);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.reg-hdr{background:var(--surf2);padding:8px 13px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--dim);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px}
+.mrow{display:flex;justify-content:space-between;align-items:center;padding:8px 13px;border-bottom:1px solid rgba(29,46,71,.5);transition:background .15s}
+.mrow:last-child{border-bottom:none}
+.mrow:hover{background:var(--surf2)}
+.mname{font-size:12px;font-weight:500}
+.mprice{font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;text-align:right}
+.mchg{font-size:11px;font-weight:500;text-align:right;font-variant-numeric:tabular-nums}
+.up{color:var(--green)}.down{color:var(--red)}.flat{color:var(--dim)}
+
+/* ── Crypto grid ── */
+.crypto-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.cc{background:var(--surf2);border:1px solid var(--border);border-radius:7px;padding:10px 11px}
+.cc-top{display:flex;align-items:center;gap:7px;margin-bottom:5px}
+.cc-img{width:22px;height:22px;border-radius:50%}
+.cc-sym{font-size:12px;font-weight:700}
+.cc-rank{font-size:10px;color:var(--dim)}
+.cc-price{font-size:13px;font-weight:600;font-variant-numeric:tabular-nums}
+.cc-chg{font-size:11px;margin-top:1px}
+.cc-mcap{font-size:10px;color:var(--dim);margin-top:2px}
+
+/* ── Signals grid ── */
+.sig-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}
+.sig-item{display:flex;gap:9px;align-items:flex-start;padding:8px 11px;background:var(--surf2);border-radius:6px;border-left:3px solid var(--border);font-size:12px;line-height:1.4}
+.sig-item.bullish{border-color:rgba(34,197,94,.4)}
+.sig-item.bearish{border-color:rgba(240,75,75,.4)}
+.sig-item.risk-off{border-color:rgba(234,179,8,.4)}
+.sig-item.mixed{border-color:rgba(59,130,246,.4)}
+.sig-item.contrarian-buy{border-color:rgba(167,139,250,.4)}
+.sig-icon{font-size:14px;flex-shrink:0;margin-top:1px}
+
+/* ── Insider trades ── */
+.ins-table{width:100%;border-collapse:collapse}
+.ins-table th{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--dim);padding:6px 10px;text-align:left;border-bottom:1px solid var(--border)}
+.ins-table td{padding:7px 10px;font-size:12px;border-bottom:1px solid rgba(29,46,71,.4)}
+.ins-table tr:hover td{background:var(--surf2)}
+.trade-b{background:rgba(34,197,94,.1);color:var(--green);padding:2px 6px;border-radius:3px;font-size:10px;font-weight:700}
+.trade-s{background:rgba(240,75,75,.1);color:var(--red);padding:2px 6px;border-radius:3px;font-size:10px;font-weight:700}
+
+/* ── Card wrapper ── */
+.card{background:var(--surf);border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:10px}
+
+/* ── Footer ── */
+.footer{text-align:center;padding:22px 0 10px;color:var(--dim);font-size:11px;border-top:1px solid var(--border);margin-top:10px}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* ── Responsive ── */
+@media(max-width:1200px){.crypto-grid{grid-template-columns:repeat(4,1fr)}.g3{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:900px){.bias-hero{grid-template-columns:1fr}.g3,.g4{grid-template-columns:1fr 1fr}.pulse-row{grid-template-columns:1fr 1fr}.crypto-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:600px){.g3,.g4,.g2,.crypto-grid{grid-template-columns:1fr}.pulse-row{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="logo">MarketPulse</div>
+  <div class="hdr-right">
+    <span class="upd" id="upd"><span class="live"></span>Indlæser...</span>
+    <button class="btn" onclick="loadData()">↻ Opdater</button>
+  </div>
+</header>
+
+<div class="wrap" id="root">
+  <div class="loader"><span class="dot"></span><span class="dot"></span><span class="dot"></span>&nbsp;Henter markedsdata fra hele verden...</div>
+</div>
+
+<script>
+/* ─── helpers ─── */
+const $ = id => document.getElementById(id);
+
+function fmt(p, d=2){
+  if(p==null) return "—";
+  if(p>=10000) return p.toLocaleString("da-DK",{maximumFractionDigits:0});
+  if(p>=1000)  return p.toLocaleString("da-DK",{maximumFractionDigits:0});
+  if(p>=100)   return p.toLocaleString("da-DK",{minimumFractionDigits:2,maximumFractionDigits:2});
+  if(p>=1)     return p.toLocaleString("da-DK",{minimumFractionDigits:3,maximumFractionDigits:3});
+  return p.toLocaleString("da-DK",{minimumFractionDigits:4,maximumFractionDigits:5});
+}
+function fmtCrypto(p){
+  if(p==null) return "—";
+  if(p>=1000) return "$"+p.toLocaleString("da-DK",{maximumFractionDigits:0});
+  if(p>=1)    return "$"+p.toLocaleString("da-DK",{minimumFractionDigits:2,maximumFractionDigits:2});
+  return "$"+p.toFixed(5);
+}
+function fmtMcap(v){
+  if(!v) return "";
+  if(v>=1e12) return "$"+(v/1e12).toFixed(2)+"T";
+  if(v>=1e9)  return "$"+(v/1e9).toFixed(1)+"B";
+  if(v>=1e6)  return "$"+(v/1e6).toFixed(0)+"M";
+  return "$"+v;
+}
+function pct(v){ if(v==null) return "—"; return (v>0?"+":"")+v.toFixed(2)+"%" }
+function cls(v){ return v>0?"up":v<0?"down":"flat" }
+function arr(v){ return v>0?"▲":v<0?"▼":"●" }
+
+/* ─── renderers ─── */
+function renderBias(a){
+  if(!a) return "";
+  const bc = a.overall;
+  const icon = bc==="BULLISH"?"▲":bc==="BEARISH"?"▼":"●";
+  const scoreSign = a.score>0?"+":"";
+  const scoreColor = a.score>0?"var(--green)":a.score<0?"var(--red)":"var(--yellow)";
+  const buys = (a.buy_assets||[]).slice(0,5).map(x=>`<span class="chip buy">↑ ${x}</span>`).join("");
+  const sells = (a.sell_assets||[]).slice(0,3).map(x=>`<span class="chip sell">↓ ${x}</span>`).join("");
+  const portRows = [
+    ...(a.buy_assets||[]).slice(0,4).map(x=>`<div class="port-row"><span class="port-name">${x}</span><span class="badge buy">KØB</span></div>`),
+    ...(a.sell_assets||[]).slice(0,2).map(x=>`<div class="port-row"><span class="port-name">${x.slice(0,22)}</span><span class="badge sell">REDUCER</span></div>`),
+  ].join("");
+  return `<div class="bias-hero">
+    <div class="bias-num">
+      <div class="bias-lbl">Ugens Bias</div>
+      <div class="bias-val ${bc}">${icon} ${bc}</div>
+      <div class="score-row">
+        <span style="color:var(--green)">▲${a.bull_count}</span>
+        <span style="color:var(--dim)">vs</span>
+        <span style="color:var(--red)">▼${a.bear_count}</span>
+      </div>
+      <div style="margin-top:6px;font-size:19px;font-weight:800;color:${scoreColor}">Score ${scoreSign}${a.score}</div>
+    </div>
+    <div>
+      <div class="rec-text">${a.recommendation}</div>
+      <div class="chips">${buys}${sells}</div>
+    </div>
+    <div class="port-col">
+      <div class="port-lbl">Portfolio signal</div>
+      ${portRows||'<div style="color:var(--dim);font-size:11px">Ingen klare signaler</div>'}
+    </div>
+  </div>`;
+}
+
+function renderPulse(markets, fg){
+  const vix = (markets?.us||{})["VIX"] || {};
+  const dxy = (markets?.forex||{})["DXY"] || {};
+  const t10 = (markets?.bonds||{})["US 10Y"] || {};
+  const fgv = fg?.today?.value ?? 50;
+  const fgl = fg?.today?.label ?? "Neutral";
+  const fgy = fg?.yesterday?.value;
+  const fgtrend = fgy!=null ? (fgv>fgy?" ↑":fgv<fgy?" ↓":"") : "";
+  const vixLvl = vix.price<15?"Lavt":vix.price<20?"Normalt":vix.price<30?"Forhøjet":"Ekstremt højt";
+  const fgColor = fgv<25?"var(--red)":fgv<45?"var(--yellow)":fgv<55?"var(--dim)":"var(--green)";
+  const t10Color = (t10.change_pct||0)>0?"down":"up"; // rising rates = bad for stocks
+
+  return `<div class="pulse-row">
+    <div class="pulse-card">
+      <div class="p-lbl">Fear &amp; Greed Index</div>
+      <div class="p-val" style="color:${fgColor}">${fgv}${fgtrend}</div>
+      <div class="p-sub">${fgl}</div>
+      <div class="fg-bar"><div class="fg-pin" style="left:${fgv}%"></div></div>
+      ${fgy!=null?`<div style="font-size:10px;color:var(--dim)">I går: ${fgy}</div>`:""}
+    </div>
+    <div class="pulse-card">
+      <div class="p-lbl">VIX — Volatilitet</div>
+      <div class="p-val ${cls(-(vix.change_pct||0))}">${vix.price!=null?vix.price.toFixed(1):"—"}</div>
+      <div class="p-sub ${cls(vix.change_pct)}">${arr(vix.change_pct)} ${pct(vix.change_pct)} &nbsp;·&nbsp; ${vixLvl}</div>
+    </div>
+    <div class="pulse-card">
+      <div class="p-lbl">USD Index (DXY)</div>
+      <div class="p-val ${cls(dxy.change_pct)}">${dxy.price!=null?dxy.price.toFixed(2):"—"}</div>
+      <div class="p-sub ${cls(dxy.change_pct)}">${arr(dxy.change_pct)} ${pct(dxy.change_pct)} dag &nbsp;·&nbsp; ${pct(dxy.week_pct)} uge</div>
+    </div>
+    <div class="pulse-card">
+      <div class="p-lbl">US 10Y Rente</div>
+      <div class="p-val ${t10Color}">${t10.price!=null?t10.price.toFixed(2)+"%":"—"}</div>
+      <div class="p-sub ${cls(t10.change_pct)}">${arr(t10.change_pct)} ${pct(t10.change_pct)} dag</div>
+    </div>
+  </div>`;
+}
+
+function renderRegion(title, flag, data){
+  if(!data||!Object.keys(data).length) return "";
+  const rows = Object.entries(data).filter(([n])=>n!=="VIX").map(([name,d])=>`
+    <div class="mrow">
+      <span class="mname">${name}</span>
+      <div>
+        <div class="mprice">${fmt(d.price)}</div>
+        <div class="mchg ${cls(d.change_pct)}">${arr(d.change_pct)} ${pct(d.change_pct)} <span style="color:var(--dim)">(${pct(d.week_pct)} uge)</span></div>
+      </div>
+    </div>`).join("");
+  return `<div class="region"><div class="reg-hdr">${flag} ${title}</div>${rows}</div>`;
+}
+
+function renderCommodities(data){
+  if(!data) return "";
+  const rows = Object.entries(data).map(([name,d])=>`
+    <div class="mrow">
+      <span class="mname">${name}</span>
+      <div>
+        <div class="mprice">${fmt(d.price)}</div>
+        <div class="mchg ${cls(d.change_pct)}">${arr(d.change_pct)} ${pct(d.change_pct)} <span style="color:var(--dim)">(${pct(d.week_pct)} uge)</span></div>
+      </div>
+    </div>`).join("");
+  return `<div class="region"><div class="reg-hdr">⛏️ RÅVARER</div>${rows}</div>`;
+}
+
+function renderForex(data){
+  if(!data) return "";
+  const rows = Object.entries(data).filter(([n])=>n!=="DXY").map(([name,d])=>`
+    <div class="mrow">
+      <span class="mname">${name}</span>
+      <div>
+        <div class="mprice">${fmt(d.price)}</div>
+        <div class="mchg ${cls(d.change_pct)}">${arr(d.change_pct)} ${pct(d.change_pct)}</div>
+      </div>
+    </div>`).join("");
+  return `<div class="region"><div class="reg-hdr">💱 VALUTA / FOREX</div>${rows}</div>`;
+}
+
+function renderBonds(data){
+  if(!data) return "";
+  const rows = Object.entries(data).map(([name,d])=>`
+    <div class="mrow">
+      <span class="mname">${name}</span>
+      <div>
+        <div class="mprice">${d.price!=null?d.price.toFixed(2)+"%":"—"}</div>
+        <div class="mchg ${cls(d.change_pct)}">${arr(d.change_pct)} ${pct(d.change_pct)}</div>
+      </div>
+    </div>`).join("");
+  return `<div class="region"><div class="reg-hdr">📋 RENTER & OBLIGATIONER</div>${rows}</div>`;
+}
+
+function renderFutures(data){
+  if(!data) return "";
+  const rows = Object.entries(data).map(([name,d])=>`
+    <div class="mrow">
+      <span class="mname">${name}</span>
+      <div>
+        <div class="mprice">${fmt(d.price)}</div>
+        <div class="mchg ${cls(d.change_pct)}">${arr(d.change_pct)} ${pct(d.change_pct)}</div>
+      </div>
+    </div>`).join("");
+  return `<div class="region" style="grid-column:span 1"><div class="reg-hdr">⚡ EQUITY FUTURES</div>${rows}</div>`;
+}
+
+function renderCrypto(crypto){
+  if(!crypto||!Object.keys(crypto).length) return "";
+  let cards = "";
+  let i=0;
+  for(const [sym,d] of Object.entries(crypto)){
+    if(i++>=12) break;
+    cards+=`<div class="cc">
+      <div class="cc-top">
+        <img class="cc-img" src="${d.image}" alt="${sym}" onerror="this.style.display='none'">
+        <div><div class="cc-sym">${sym}</div><div class="cc-rank">#${d.rank}</div></div>
+      </div>
+      <div class="cc-price">${fmtCrypto(d.price)}</div>
+      <div class="cc-chg ${cls(d.change_pct)}">${arr(d.change_pct)} ${pct(d.change_pct)}</div>
+      <div style="font-size:10px;color:var(--dim);margin-top:1px">uge: <span class="${cls(d.week_pct)}">${pct(d.week_pct)}</span></div>
+      <div class="cc-mcap">${fmtMcap(d.market_cap)}</div>
+    </div>`;
+  }
+  return `<div class="card"><div class="sec" style="margin-top:0">₿ KRYPTO — TOP 12</div><div class="crypto-grid">${cards}</div></div>`;
+}
+
+function renderSignals(analysis){
+  if(!analysis?.signals?.length) return "";
+  const items = analysis.signals.map(s=>`
+    <div class="sig-item ${s.type}">
+      <span class="sig-icon">${s.icon}</span>
+      <span>${s.text}</span>
+    </div>`).join("");
+  return `<div class="card"><div class="sec" style="margin-top:0">📡 SMART MONEY SIGNALER</div><div class="sig-grid">${items}</div></div>`;
+}
+
+function renderInsider(trades){
+  if(!trades?.length) return `<div class="card"><div class="sec" style="margin-top:0">🕵️ INSIDER HANDLER</div><div style="color:var(--dim);padding:8px 0">Ingen data tilgængelig for øjeblikket</div></div>`;
+  const rows = trades.slice(0,15).map(t=>`<tr>
+    <td style="color:var(--dim)">${t.date}</td>
+    <td><strong style="color:var(--blue)">${t.ticker}</strong></td>
+    <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t.company}</td>
+    <td style="color:var(--dim)">${t.title}</td>
+    <td><span class="${t.is_buy?"trade-b":"trade-s"}">${t.type}</span></td>
+    <td class="${t.is_buy?"up":"down"}" style="font-variant-numeric:tabular-nums">${t.price}</td>
+    <td style="color:var(--dim)">${t.qty}</td>
+    <td class="${t.is_buy?"up":"down"}" style="font-weight:600">${t.value}</td>
+  </tr>`).join("");
+  return `<div class="card">
+    <div class="sec" style="margin-top:0">🕵️ INSIDER HANDLER — Seneste 7 dage &nbsp;<span style="font-weight:400;text-transform:none;font-size:10px">Kilde: OpenInsider</span></div>
+    <div style="overflow-x:auto">
+      <table class="ins-table">
+        <thead><tr><th>Dato</th><th>Ticker</th><th>Selskab</th><th>Titel</th><th>Type</th><th>Pris</th><th>Antal</th><th>Værdi</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    <div style="margin-top:8px;font-size:10px;color:var(--dim)">
+      💡 Insider-køb (P = Purchase) er et stærkt signal — insiders køber kun af én grund: de forventer kursstigning. Salg kan skyldes personlige behov og er mindre signifikant.
+    </div>
+  </div>`;
+}
+
+/* ─── main render ─── */
+function renderAll(data){
+  const m = data.markets||{};
+  const c = data.crypto||{};
+  const fg = data.fear_greed||{};
+  const a = data.analysis||{};
+  const ins = data.insider_trades||[];
+
+  let html = "";
+
+  html += renderBias(a);
+  html += renderPulse(m, fg);
+  html += renderSignals(a);
+
+  html += `<div class="sec">🌍 GLOBALE MARKEDER</div>`;
+  html += `<div class="g3">`;
+  html += renderRegion("USA 🇺🇸","",m.us);
+  html += renderRegion("EUROPA 🇪🇺","",m.eu);
+  html += renderRegion("ASIEN 🌏","",m.asia);
+  html += `</div>`;
+
+  html += `<div class="sec">💼 RÅVARER · VALUTA · RENTER · FUTURES</div>`;
+  html += `<div class="g4">`;
+  html += renderCommodities(m.commodities);
+  html += renderForex(m.forex);
+  html += renderBonds(m.bonds);
+  html += renderFutures(m.futures);
+  html += `</div>`;
+
+  html += renderCrypto(c);
+  html += renderInsider(ins);
+
+  html += `<div class="footer">
+    MarketPulse &nbsp;·&nbsp; Data: Yahoo Finance, CoinGecko &amp; OpenInsider
+    &nbsp;·&nbsp; Opdateres automatisk hvert 5. minut
+    &nbsp;·&nbsp; <em>Kun til informationsformål — ikke investeringsrådgivning</em>
+  </div>`;
+
+  $("root").innerHTML = html;
+  $("upd").innerHTML = `<span class="live"></span>Sidst opdateret: ${data.updated}`;
+}
+
+/* ─── fetch ─── */
+async function loadData(){
+  $("upd").innerHTML = `<span class="dot"></span><span class="dot"></span><span class="dot"></span>`;
+  try{
+    const r = await fetch("/api/data");
+    if(!r.ok) throw new Error("HTTP "+r.status);
+    renderAll(await r.json());
+  }catch(e){
+    $("root").innerHTML=`<div style="text-align:center;padding:60px;color:var(--red)">
+      <div style="font-size:32px;margin-bottom:10px">⚠️</div>
+      <div style="font-size:15px">Kunne ikke hente data</div>
+      <div style="font-size:11px;color:var(--dim);margin-top:6px">${e.message}</div>
+      <button class="btn" style="margin-top:16px" onclick="loadData()">Prøv igen</button>
+    </div>`;
+    $("upd").innerHTML="Fejl";
+  }
+}
+
+loadData();
+setInterval(loadData, 5*60*1000);
+</script>
+</body>
+</html>
