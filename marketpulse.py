@@ -305,28 +305,58 @@ def generate_analysis(markets: dict, crypto: dict, fg: dict) -> dict:
     bear  = sum(1 for s in signals if s["type"] in ("bearish", "caution"))
     score = bull - bear
 
+    sp_day = (mget("us", "S&P 500") or {}).get("change_pct", 0) or 0
+    sp_week = (mget("us", "S&P 500") or {}).get("week_pct", 0) or 0
+    gold_week = (mget("commodities", "Guld") or {}).get("week_pct", 0) or 0
+    btc_week = (crypto.get("BTC") or {}).get("week_pct", 0) or 0
+
     if score >= 2:
         overall = "BULLISH"
         recommendation = (
-            "Markedet viser klare bullish signaler. Institutioner er positioneret for opside. "
-            "Overvej at øge eksponering mod aktier og vækstaktiver — men hold risikostyring."
+            "Markedet ser fornuftigt ud lige nu. De fleste signaler peger opad, og de store professionelle investorer "
+            "er ikke i panik-mode. Det betyder ikke at du skal kaste alt i markedet, men det er ikke et tidspunkt "
+            "hvor du behøver at sidde på hænderne. Hold øje med dine eksisterende positioner og overvej om du "
+            "mangler eksponering mod de aktiver der klarer sig bedst denne uge."
+        )
+        summary = (
+            f"S&P 500 er {'steget' if sp_week > 0 else 'faldet'} {abs(sp_week):.1f}% denne uge. "
+            f"Guld er {'op' if gold_week > 0 else 'ned'} {abs(gold_week):.1f}%. "
+            f"Bitcoin {'stiger' if btc_week > 0 else 'falder'} {abs(btc_week):.1f}% på ugebasis. "
+            f"Frygts-indekset viser {fg_val} — {'investorerne er nervøse, hvilket historisk er et godt tegn for contrarian-investorer' if fg_val < 40 else 'markedet er relativt roligt'}."
         )
     elif score <= -2:
         overall = "BEARISH"
         recommendation = (
-            "Bearish signaler dominerer. Smart money reducerer risiko. "
-            "Overvej at øge cash-andelen, hedge eksponering med put-optioner eller roter til safe haven (guld, obligationer)."
+            "Der er røde flag i markedet nu. De professionelle investorer reducerer risiko, og flere signaler "
+            "peger nedad. Det er ikke nødvendigvis panik — men det er et tidspunkt hvor du bør tænke dig om. "
+            "Overvej om du har for meget eksponering mod risikofyldte aktiver, og om det giver mening at "
+            "have lidt mere cash eller guld som beskyttelse."
+        )
+        summary = (
+            f"S&P 500 er {'steget' if sp_week > 0 else 'faldet'} {abs(sp_week):.1f}% denne uge. "
+            f"Guld er {'op' if gold_week > 0 else 'ned'} {abs(gold_week):.1f}% — {'investorer søger sikkerhed' if gold_week > 0 else 'selv safe haven aktiver er under pres'}. "
+            f"Bitcoin {'stiger' if btc_week > 0 else 'falder'} {abs(btc_week):.1f}% på ugebasis. "
+            f"Frygt-indekset er på {fg_val} — {'ekstrem frygt i markedet' if fg_val < 25 else 'forhøjet nervøsitet blandt investorer'}."
         )
     else:
         overall = "NEUTRAL"
         recommendation = (
-            "Markedet er i balance — bull og bear kræfter neutraliserer hinanden. "
-            "Hold nuværende positioner. Afvent klarere retningssignal inden ny eksponering tages."
+            "Markedet sender blandede signaler — der er hverken stærke grunde til at købe aggressivt "
+            "eller til at sælge ud. Det bedste du kan gøre er at holde din nuværende strategi og undgå "
+            "at reagere impulsivt på daglige udsving. Vent på et klarere signal inden du foretager "
+            "større ændringer i din portefølje."
+        )
+        summary = (
+            f"S&P 500 er {'steget' if sp_week > 0 else 'faldet'} {abs(sp_week):.1f}% denne uge — hverken imponerende eller alarmerende. "
+            f"Guld er {'op' if gold_week > 0 else 'ned'} {abs(gold_week):.1f}%. "
+            f"Bitcoin {'stiger' if btc_week > 0 else 'falder'} {abs(btc_week):.1f}% på ugebasis. "
+            f"Frygt-indekset viser {fg_val} ({fg.get('today', {}).get('label', 'Neutral')}) — markedet er afventende."
         )
 
     return {
         "overall":        overall,
         "recommendation": recommendation,
+        "summary":        summary,
         "signals":        signals,
         "buy_assets":     list(dict.fromkeys(buy_assets)),
         "sell_assets":    list(dict.fromkeys(sell_assets)),
