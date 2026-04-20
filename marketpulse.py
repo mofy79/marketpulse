@@ -68,6 +68,19 @@ SYMBOLS = {
         "Dow Future":      "YM=F",
         "Russell Future":  "RTY=F",
     },
+    "sectors": {
+        "Teknologi":        "XLK",
+        "Energi":           "XLE",
+        "Finans":           "XLF",
+        "Sundhed":          "XLV",
+        "Industri":         "XLI",
+        "Forbrug (vækst)":  "XLY",
+        "Forbrug (defensiv)":"XLP",
+        "Forsyning":        "XLU",
+        "Ejendomme":        "XLRE",
+        "Materialer":       "XLB",
+        "Kommunikation":    "XLC",
+    },
 }
 
 
@@ -178,7 +191,48 @@ def fetch_fear_greed() -> dict:
         return {"today": {"value": 50, "label": "Neutral"}, "yesterday": None}
 
 
-def fetch_insider_trades() -> list:
+def fetch_economic_calendar():
+    cached = cache_get("calendar")
+    if cached:
+        return cached
+    try:
+        r = requests.get(
+            "https://nfs.faireconomy.media/ff_calendar_thisweek.json",
+            timeout=10, headers={"User-Agent": "Mozilla/5.0"}
+        )
+        events = r.json()
+        filtered = [e for e in events if
+                    e.get("impact") in ("High", "Medium") and
+                    e.get("country") in ("USD", "EUR", "GBP", "JPY", "CNY")]
+        filtered.sort(key=lambda x: x.get("date", ""))
+        cache_set("calendar", filtered)
+        return filtered
+    except Exception as e:
+        print(f"Calendar error: {e}")
+        return []
+
+
+def fetch_btc_dominance():
+    cached = cache_get("btc_dom")
+    if cached:
+        return cached
+    try:
+        r = requests.get("https://api.coingecko.com/api/v3/global", timeout=10)
+        d = r.json()["data"]
+        result = {
+            "btc":        round(d["market_cap_percentage"].get("btc", 0), 1),
+            "eth":        round(d["market_cap_percentage"].get("eth", 0), 1),
+            "total_mcap": d["total_market_cap"].get("usd", 0),
+            "change_24h": round(d.get("market_cap_change_percentage_24h_usd", 0), 2),
+        }
+        cache_set("btc_dom", result)
+        return result
+    except Exception as e:
+        print(f"BTC dominance error: {e}")
+        return {}
+
+
+def fetch_insider_trades():
     cached = cache_get("insider")
     if cached:
         return cached
@@ -301,6 +355,19 @@ def generate_analysis(markets: dict, crypto: dict, fg: dict) -> dict:
     if nasdaq and nasdaq.get("week_pct", 0) > 2:
         buy_assets.append("Europa (DAX/EWG)")
 
+    # Yield curve
+    t2_price  = (mget("bonds", "US 2Y")  or {}).get("price", 0) or 0
+    t10_price = (mget("bonds", "US 10Y") or {}).get("price", 0) or 0
+    t30_price = (mget("bonds", "US 30Y") or {}).get("price", 0) or 0
+    spread_2_10 = round(t10_price - t2_price, 2) if t2_price and t10_price else None
+    if spread_2_10 is not None:
+        if spread_2_10 < 0:
+            signals.append({"icon": "🔴", "text": f"Rentekurven INVERTERET (spread: {spread_2_10:.2f}%) — 2Y ({t2_price:.2f}%) > 10Y ({t10_price:.2f}%). Dette er historisk det stærkeste recession-signal.", "type": "bearish"})
+        elif spread_2_10 < 0.3:
+            signals.append({"icon": "🟡", "text": f"Rentekurven meget flad (spread: {spread_2_10:.2f}%) — markedet er usikker på fremtidig vækst.", "type": "neutral"})
+        else:
+            signals.append({"icon": "🟢", "text": f"Rentekurven normal (spread: +{spread_2_10:.2f}%) — 10Y ({t10_price:.2f}%) over 2Y ({t2_price:.2f}%). Sundt tegn.", "type": "bullish"})
+
     bull  = sum(1 for s in signals if s["type"] in ("bullish", "contrarian-buy"))
     bear  = sum(1 for s in signals if s["type"] in ("bearish", "caution"))
     score = bull - bear
@@ -363,6 +430,13 @@ def generate_analysis(markets: dict, crypto: dict, fg: dict) -> dict:
         "bull_count":     bull,
         "bear_count":     bear,
         "score":          score,
+        "yield_curve": {
+            "t2":       round(t2_price, 2),
+            "t10":      round(t10_price, 2),
+            "t30":      round(t30_price, 2),
+            "spread":   spread_2_10,
+            "inverted": spread_2_10 < 0 if spread_2_10 is not None else False,
+        },
     }
 
 
@@ -373,18 +447,22 @@ def index():
 
 @app.route("/api/data")
 def api_data():
-    markets  = fetch_all_markets()
-    crypto   = fetch_crypto()
-    fg       = fetch_fear_greed()
-    insider  = fetch_insider_trades()
-    analysis = generate_analysis(markets, crypto, fg)
+    markets   = fetch_all_markets()
+    crypto    = fetch_crypto()
+    fg        = fetch_fear_greed()
+    insider   = fetch_insider_trades()
+    calendar  = fetch_economic_calendar()
+    btc_dom   = fetch_btc_dominance()
+    analysis  = generate_analysis(markets, crypto, fg)
     return jsonify({
-        "markets":       markets,
-        "crypto":        crypto,
-        "fear_greed":    fg,
+        "markets":        markets,
+        "crypto":         crypto,
+        "fear_greed":     fg,
         "insider_trades": insider,
-        "analysis":      analysis,
-        "updated":       datetime.now().strftime("%d. %b %Y kl. %H:%M"),
+        "calendar":       calendar,
+        "btc_dominance":  btc_dom,
+        "analysis":       analysis,
+        "updated":        datetime.now().strftime("%d. %b %Y kl. %H:%M"),
     })
 
 

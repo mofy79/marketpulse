@@ -137,6 +137,44 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .sig-icon{font-size:18px;flex-shrink:0}
 .sig-text{font-size:12px;color:var(--text);line-height:1.5}
 
+/* ── Sektor heatmap ── */
+.sector-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:4px}
+.sector-card{border-radius:9px;padding:11px 12px;text-align:center;transition:.15s;cursor:default}
+.sector-card:hover{opacity:.85}
+.sc-name{font-size:11px;font-weight:600;color:#fff;margin-bottom:4px;line-height:1.2}
+.sc-pct{font-size:16px;font-weight:800;color:#fff}
+.sc-day{font-size:10px;color:rgba(255,255,255,.75);margin-top:2px}
+
+/* ── Yield curve ── */
+.yc-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:16px 20px;box-shadow:var(--shadow)}
+.yc-title{font-size:12px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px}
+.yc-bars{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+.yc-row{display:flex;align-items:center;gap:10px}
+.yc-label{font-size:11px;color:var(--dim);width:36px;flex-shrink:0}
+.yc-bar-wrap{flex:1;background:var(--bg);border-radius:3px;height:10px;overflow:hidden}
+.yc-bar{height:100%;border-radius:3px;transition:.3s}
+.yc-val{font-size:12px;font-weight:700;width:44px;text-align:right}
+.yc-spread{font-size:13px;font-weight:700;padding:8px 12px;border-radius:7px;text-align:center;margin-top:6px}
+
+/* ── Ekonomisk kalender ── */
+.cal-list{display:flex;flex-direction:column;gap:6px}
+.cal-item{background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow)}
+.cal-impact{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.cal-impact.High{background:var(--red)}
+.cal-impact.Medium{background:var(--yellow)}
+.cal-date{font-size:11px;color:var(--dim);width:80px;flex-shrink:0}
+.cal-country{font-size:10px;font-weight:700;width:28px;flex-shrink:0}
+.cal-name{font-size:12px;font-weight:600;flex:1}
+.cal-vals{font-size:11px;color:var(--dim);text-align:right}
+
+/* ── BTC dominans ── */
+.dom-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:16px 20px;box-shadow:var(--shadow)}
+.dom-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.dom-bar-wrap{background:var(--bg);border-radius:4px;height:12px;overflow:hidden;margin-bottom:6px;display:flex}
+.dom-bar-btc{background:#f59e0b;height:100%}
+.dom-bar-eth{background:#6366f1;height:100%}
+.dom-bar-alt{background:var(--border2);height:100%;flex:1}
+
 /* ── Insider ── */
 .ins-wrap{background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden;box-shadow:var(--shadow)}
 .ins-hdr{background:var(--surface2);padding:12px 16px;border-bottom:1px solid var(--border)}
@@ -400,10 +438,117 @@ function renderInsider(trades){
   </div>`;
 }
 
+/* ─── Sektor rotation ─── */
+function sectorColor(pct){
+  if(pct>=3)  return "#15803d";
+  if(pct>=1)  return "#22c55e";
+  if(pct>=0)  return "#86efac";
+  if(pct>=-1) return "#fca5a5";
+  if(pct>=-3) return "#ef4444";
+  return "#b91c1c";
+}
+function renderSectors(sectors){
+  if(!sectors||!Object.keys(sectors).length) return "";
+  const sorted = Object.entries(sectors).sort((a,b)=>(b[1].week_pct||0)-(a[1].week_pct||0));
+  const cards = sorted.map(([name,d])=>`
+    <div class="sector-card" style="background:${sectorColor(d.week_pct||0)}">
+      <div class="sc-name">${name}</div>
+      <div class="sc-pct">${pct(d.week_pct)}</div>
+      <div class="sc-day">i dag: ${pct(d.change_pct)}</div>
+    </div>`).join("");
+  const best = sorted[0]?.[0]||"";
+  const worst = sorted[sorted.length-1]?.[0]||"";
+  return `
+  <div class="info-box">
+    <strong>Sektorrotation viser præcis hvor pengene bevæger sig.</strong> Mørk grøn = kapitalen strømmer ind.
+    Mørk rød = kapitalen forlader sektoren. Denne uge fører <strong>${best}</strong> — og
+    <strong>${worst}</strong> er bagud. Institutioner bruger sektorrotation til at se hvad markedet "tror på".
+  </div>
+  <div class="sector-grid">${cards}</div>`;
+}
+
+/* ─── Rentekurve ─── */
+function renderYieldCurve(yc){
+  if(!yc||!yc.t2) return "";
+  const max = Math.max(yc.t2, yc.t10, yc.t30, 6);
+  const bar = (v) => `<div class="yc-bar" style="width:${(v/max*100).toFixed(1)}%;background:${v>0?"var(--blue)":"var(--red)"}"></div>`;
+  const spreadColor = yc.inverted ? "var(--red-bg);color:var(--red);border:1px solid var(--red-bd)" : "var(--green-bg);color:var(--green);border:1px solid var(--green-bd)";
+  const spreadText = yc.inverted
+    ? `INVERTERET (${yc.spread}%) — 2Y renten er højere end 10Y. Dette er historisk set en advarsel om recession inden for 12-18 måneder.`
+    : `Normal kurve (spread +${yc.spread}%) — 10Y renten er højere end 2Y. Det er sundt og normalt.`;
+  return `<div class="yc-card">
+    <div class="yc-title">Rentekurven (Yield Curve)</div>
+    <div class="yc-bars">
+      <div class="yc-row"><span class="yc-label">2 år</span><div class="yc-bar-wrap">${bar(yc.t2)}</div><span class="yc-val ${yc.t2>0?"up":"down"}">${yc.t2}%</span></div>
+      <div class="yc-row"><span class="yc-label">10 år</span><div class="yc-bar-wrap">${bar(yc.t10)}</div><span class="yc-val ${yc.t10>0?"up":"down"}">${yc.t10}%</span></div>
+      <div class="yc-row"><span class="yc-label">30 år</span><div class="yc-bar-wrap">${bar(yc.t30)}</div><span class="yc-val ${yc.t30>0?"up":"down"}">${yc.t30}%</span></div>
+    </div>
+    <div class="yc-spread" style="background:${spreadColor}">${spreadText}</div>
+  </div>`;
+}
+
+/* ─── BTC dominans ─── */
+function renderBTCDom(dom){
+  if(!dom||!dom.btc) return "";
+  const alt = Math.max(0, 100-dom.btc-dom.eth);
+  const mcapStr = dom.total_mcap>=1e12?"$"+(dom.total_mcap/1e12).toFixed(2)+"T":"$"+(dom.total_mcap/1e9).toFixed(0)+"B";
+  const domExplain = dom.btc>60
+    ? "Bitcoin dominerer — penge er i BTC, altcoins er upopulære. Typisk i usikre tider."
+    : dom.btc>50
+    ? "Bitcoin stærk dominans — markedet er relativt konservativt i krypto."
+    : "Bitcoin dominans lav — kapital roterer til altcoins. Typisk 'altseason' eller spekulativ stemning.";
+  return `<div class="dom-card">
+    <div class="yc-title">Krypto Markedsandel (Dominans)</div>
+    <div class="dom-row">
+      <span style="font-size:13px;font-weight:700">Samlet krypto markedsværdi: <span class="${cls(dom.change_24h)}">${mcapStr}</span> <span style="font-size:11px;color:var(--dim)">(${pct(dom.change_24h)} i dag)</span></span>
+    </div>
+    <div class="dom-bar-wrap">
+      <div class="dom-bar-btc" style="width:${dom.btc}%"></div>
+      <div class="dom-bar-eth" style="width:${dom.eth}%"></div>
+      <div class="dom-bar-alt" style="width:${alt}%"></div>
+    </div>
+    <div style="display:flex;gap:16px;font-size:11px;margin-bottom:8px">
+      <span><span style="color:#f59e0b;font-weight:700">■</span> Bitcoin ${dom.btc}%</span>
+      <span><span style="color:#6366f1;font-weight:700">■</span> Ethereum ${dom.eth}%</span>
+      <span><span style="color:var(--dim2);font-weight:700">■</span> Altcoins ${alt.toFixed(1)}%</span>
+    </div>
+    <div style="font-size:11px;color:var(--dim)">${domExplain}</div>
+  </div>`;
+}
+
+/* ─── Ekonomisk kalender ─── */
+function renderCalendar(events){
+  if(!events?.length) return `<div class="info-box">Ingen vigtige begivenheder fundet for denne uge.</div>`;
+  const now = new Date();
+  const items = events.slice(0,20).map(e=>{
+    const d = new Date(e.date);
+    const isPast = d < now;
+    const dateStr = d.toLocaleDateString("da-DK",{weekday:"short",month:"short",day:"numeric"});
+    const timeStr = d.toLocaleTimeString("da-DK",{hour:"2-digit",minute:"2-digit"});
+    const flags = {"USD":"🇺🇸","EUR":"🇪🇺","GBP":"🇬🇧","JPY":"🇯🇵","CNY":"🇨🇳"};
+    return `<div class="cal-item" style="${isPast?"opacity:.55":""}">
+      <div class="cal-impact ${e.impact}"></div>
+      <div class="cal-date">${dateStr} ${timeStr}</div>
+      <div class="cal-country">${flags[e.country]||e.country}</div>
+      <div class="cal-name">${e.title}${isPast?' <span style="font-size:10px;color:var(--dim)">(afsluttet)</span>':''}</div>
+      <div class="cal-vals">
+        ${e.forecast?`<div>Forventet: <strong>${e.forecast}</strong></div>`:""}
+        ${e.previous?`<div style="color:var(--dim2)">Forrige: ${e.previous}</div>`:""}
+      </div>
+    </div>`;
+  }).join("");
+  return `<div class="info-box">
+    <strong>Kommende markedsbevægende begivenheder.</strong> Rød prik = høj impact (Fed, CPI, jobs-rapport).
+    Gul prik = medium impact. Institutioner positionerer sig <em>inden</em> disse tal kommer ud — så du bør kende dem.
+  </div>
+  <div class="cal-list">${items}</div>`;
+}
+
 /* ─── Main render ─── */
 function renderAll(data){
   const m=data.markets||{}, c=data.crypto||{}, fg=data.fear_greed||{};
   const a=data.analysis||{}, ins=data.insider_trades||[];
+  const cal=data.calendar||[], dom=data.btc_dominance||{};
   let html="";
 
   html+=renderBias(a);
@@ -419,23 +564,46 @@ function renderAll(data){
   html+=renderRegion("Asien","🌏",m.asia,"Nikkei · Hang Seng");
   html+=`</div>`;
 
-  html+=`<div class="sec-label">Råvarer · Valuta · Renter · Equity Futures</div>`;
-  html+=`<div class="g4">`;
+  html+=`<div class="sec-label">Sektorrotation — hvor bevæger pengene sig?</div>`;
+  html+=renderSectors(m.sectors);
+
+  html+=`<div class="sec-label">Råvarer · Valuta · Futures</div>`;
+  html+=`<div class="g3">`;
   html+=renderRegion("Råvarer","⛏️",m.commodities,"Guld · Olie · Gas");
   html+=renderRegion("Valuta (Forex)","💱",Object.fromEntries(Object.entries(m.forex||{}).filter(([k])=>k!=="DXY")),"EUR · GBP · JPY");
-  html+=renderRegion("Renter","📋",m.bonds,"USA 2Y · 10Y · 30Y");
   html+=renderRegion("Futures (pre-market)","⚡",m.futures,"Viser retning inden markedet åbner");
   html+=`</div>`;
 
+  html+=`<div class="sec-label">Rentekurve & obligationer</div>`;
+  html+=`<div class="g2">`;
+  html+=renderYieldCurve(a.yield_curve);
+  html+=renderRegion("Renter","📋",m.bonds,"Hvad koster det at låne penge i USA?");
+  html+=`</div>`;
+
   html+=`<div class="sec-label">Kryptomarkedet — top 12</div>`;
+  html+=`<div class="g2" style="margin-bottom:8px">`;
+  html+=`<div>`;
+  html+=renderBTCDom(dom);
+  html+=`</div>`;
+  html+=`<div style="font-size:12px;color:var(--dim);background:#fff;border:1px solid var(--border);border-radius:10px;padding:16px 20px;box-shadow:var(--shadow)">
+    <strong style="color:var(--text);font-size:13px">Hvad er BTC dominans?</strong><br><br>
+    Tænk på krypto-markedet som en kage. BTC dominans viser hvor stor en del Bitcoin er af den samlede kage.
+    <br><br>
+    <strong>Høj BTC dominans (>60%):</strong> Penge sidder sikkert i Bitcoin. Markedet er defensivt.<br><br>
+    <strong>Faldende BTC dominans:</strong> Penge roterer ud i altcoins — spekulativ stemning, typisk bullish for ETH og altcoins.<br><br>
+    <strong>Stigende BTC dominans under fald:</strong> Altcoins sælges hårdere end BTC — flight to safety inden for krypto.
+  </div>`;
+  html+=`</div>`;
   html+=renderCrypto(c);
+
+  html+=`<div class="sec-label">Ugens vigtige begivenheder (Ekonomisk kalender)</div>`;
+  html+=renderCalendar(cal);
 
   html+=`<div class="sec-label" style="margin-top:18px">Insider-handler — hvad ved de selv noget om?</div>`;
   html+=renderInsider(ins);
 
   html+=`<div class="footer">
-    MarketPulse &nbsp;·&nbsp; Data: Yahoo Finance, CoinGecko, OpenInsider
-    &nbsp;·&nbsp; Opdateres automatisk hver time
+    MarketPulse &nbsp;·&nbsp; Data: Yahoo Finance, CoinGecko, OpenInsider, ForexFactory
     &nbsp;·&nbsp; <em>Kun til informationsformål — ikke investeringsrådgivning</em>
   </div>`;
 
