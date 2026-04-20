@@ -10,7 +10,7 @@ app = Flask(__name__)
 
 _cache = {}
 _cache_ts = {}
-CACHE_TTL = 300  # 5 min
+CACHE_TTL = 3600  # 1 time
 
 def cache_get(key):
     if key in _cache and time.time() - _cache_ts.get(key, 0) < CACHE_TTL:
