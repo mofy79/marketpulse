@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MarketPulse — Din Daglige Markedsoversigt</title>
+<title>MarketPulse — Early Warning Dashboard</title>
 <style>
 :root {
   --bg:       #f0f4f8;
@@ -22,242 +22,330 @@
   --red-bd:   #fecaca;
   --yellow:   #d97706;
   --yellow-bg:#fffbeb;
+  --yellow-bd:#fde68a;
   --blue:     #2563eb;
   --blue-bg:  #eff6ff;
   --blue-bd:  #bfdbfe;
   --shadow:   0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
   --shadow-md:0 4px 6px rgba(0,0,0,.07), 0 2px 4px rgba(0,0,0,.05);
+  --shadow-lg:0 10px 15px rgba(0,0,0,.07), 0 4px 6px rgba(0,0,0,.05);
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;font-size:14px;line-height:1.5;min-height:100vh}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;font-size:14px;line-height:1.5}
 
 /* ── Header ── */
-.hdr{background:#fff;border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:99;box-shadow:var(--shadow)}
-.logo{font-size:18px;font-weight:800;letter-spacing:-0.5px;color:var(--blue)}
-.logo span{color:var(--dim)}
+.hdr{background:#fff;border-bottom:1px solid var(--border);padding:11px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:99;box-shadow:var(--shadow)}
+.logo{font-size:17px;font-weight:800;letter-spacing:-.5px;color:var(--blue)}
+.logo span{color:var(--dim);font-weight:400}
 .hdr-right{display:flex;gap:14px;align-items:center}
 .upd{color:var(--dim);font-size:12px;display:flex;align-items:center;gap:5px}
 .btn{background:#fff;border:1px solid var(--border2);color:var(--text);padding:6px 14px;border-radius:7px;cursor:pointer;font-size:12px;font-weight:500;transition:.2s;box-shadow:var(--shadow)}
-.btn:hover{background:var(--bg);border-color:var(--blue)}
-.live{display:inline-block;width:8px;height:8px;background:var(--green);border-radius:50%;animation:blink 2s infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.btn:hover{background:var(--bg);border-color:var(--blue);color:var(--blue)}
+.live{display:inline-block;width:8px;height:8px;background:var(--green);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 
-/* ── Layout ── */
-.wrap{max-width:1560px;margin:0 auto;padding:20px 20px}
+/* ── Wrap ── */
+.wrap{max-width:1600px;margin:0 auto;padding:18px 20px}
 
-/* ── Loading ── */
-.loader{display:flex;flex-direction:column;align-items:center;justify-content:center;height:200px;gap:12px;color:var(--dim)}
+/* ── Loader ── */
+.loader{display:flex;flex-direction:column;align-items:center;justify-content:center;height:220px;gap:12px;color:var(--dim)}
 .dots{display:flex;gap:6px}
-.dot{width:8px;height:8px;background:var(--blue);border-radius:50%;animation:blink 1.2s infinite}
+.dot{width:8px;height:8px;background:var(--blue);border-radius:50%;animation:pulse 1.2s infinite}
 .dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
 
 /* ── Section label ── */
-.sec-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--dim);margin:22px 0 10px;display:flex;align-items:center;gap:8px}
-.sec-label::after{content:'';flex:1;height:1px;background:var(--border)}
+.sec{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--dim);margin:20px 0 10px;display:flex;align-items:center;gap:8px}
+.sec::after{content:'';flex:1;height:1px;background:var(--border)}
 
-/* ── Bias hero ── */
-.bias-hero{background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow-md);overflow:hidden;margin-bottom:16px}
-.bias-top{padding:20px 24px 16px;display:grid;grid-template-columns:auto 1fr auto;gap:24px;align-items:start}
-.bias-badge{text-align:center;padding:16px 20px;border-radius:10px;min-width:130px}
+/* ═══════════════════════════════════════════════
+   EARLY WARNING SYSTEM — top hero
+═══════════════════════════════════════════════ */
+.ew-hero{background:linear-gradient(135deg,#1e3a5f 0%,#1e40af 50%,#1d4ed8 100%);border-radius:14px;padding:22px 26px 18px;margin-bottom:16px;box-shadow:var(--shadow-lg)}
+.ew-hero-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.ew-title-block h1{font-size:18px;font-weight:800;color:#fff;letter-spacing:-.3px}
+.ew-title-block p{font-size:12px;color:rgba(255,255,255,.65);margin-top:2px}
+.health-score-wrap{display:flex;align-items:center;gap:16px}
+.health-gauge{text-align:center}
+.health-num{font-size:42px;font-weight:900;line-height:1;letter-spacing:-2px}
+.health-lbl{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;margin-top:2px}
+.health-bar-outer{width:180px;height:10px;background:rgba(255,255,255,.2);border-radius:5px;overflow:hidden}
+.health-bar-inner{height:100%;border-radius:5px;transition:.5s}
+.health-desc{font-size:12px;color:rgba(255,255,255,.7);max-width:260px;line-height:1.5}
+
+/* ── Indicator cards grid ── */
+.ind-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.ind-card{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:13px 14px;cursor:default;transition:.2s;position:relative;overflow:hidden}
+.ind-card:hover{background:rgba(255,255,255,.13)}
+.ind-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.ind-card.green::before{background:var(--green)}
+.ind-card.yellow::before{background:#fbbf24}
+.ind-card.red::before{background:#f87171}
+.ind-card.neutral::before{background:rgba(255,255,255,.3)}
+.ind-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.ind-icon{font-size:18px}
+.ind-signal{font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;letter-spacing:.3px}
+.ind-signal.green{background:rgba(34,197,94,.25);color:#4ade80}
+.ind-signal.yellow{background:rgba(251,191,36,.25);color:#fbbf24}
+.ind-signal.red{background:rgba(248,113,113,.25);color:#f87171}
+.ind-signal.neutral{background:rgba(255,255,255,.15);color:rgba(255,255,255,.7)}
+.ind-name{font-size:13px;font-weight:700;color:#fff;line-height:1.2}
+.ind-sub{font-size:10px;color:rgba(255,255,255,.5);margin-top:1px;margin-bottom:8px}
+.ind-value{font-size:20px;font-weight:800;color:#fff;letter-spacing:-.5px;font-variant-numeric:tabular-nums}
+.ind-chg{font-size:11px;margin-top:2px}
+.ind-chg.up{color:#4ade80}.ind-chg.down{color:#f87171}.ind-chg.flat{color:rgba(255,255,255,.5)}
+.ind-divider{border:none;border-top:1px solid rgba(255,255,255,.1);margin:8px 0}
+.ind-explain{font-size:11px;color:rgba(255,255,255,.6);line-height:1.4}
+
+/* ═══════════════════════════════════════════════
+   BIAS CARD
+═══════════════════════════════════════════════ */
+.bias-hero{background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow-md);overflow:hidden;margin-bottom:14px}
+.bias-top{padding:18px 22px 14px;display:grid;grid-template-columns:auto 1fr auto;gap:22px;align-items:start}
+.bias-badge{text-align:center;padding:14px 18px;border-radius:10px;min-width:126px}
 .bias-badge.BULLISH{background:var(--green-bg);border:1px solid var(--green-bd)}
 .bias-badge.BEARISH{background:var(--red-bg);border:1px solid var(--red-bd)}
-.bias-badge.NEUTRAL{background:var(--yellow-bg);border:1px solid #fde68a}
+.bias-badge.NEUTRAL{background:var(--yellow-bg);border:1px solid var(--yellow-bd)}
 .bias-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--dim);margin-bottom:4px}
-.bias-val{font-size:22px;font-weight:900;letter-spacing:-0.5px}
-.bias-val.BULLISH{color:var(--green)}
-.bias-val.BEARISH{color:var(--red)}
-.bias-val.NEUTRAL{color:var(--yellow)}
+.bias-val{font-size:22px;font-weight:900}
+.bias-val.BULLISH{color:var(--green)}.bias-val.BEARISH{color:var(--red)}.bias-val.NEUTRAL{color:var(--yellow)}
 .bias-score{font-size:12px;color:var(--dim);margin-top:5px}
-.bias-main h2{font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px}
+.bias-main h2{font-size:15px;font-weight:700;margin-bottom:5px}
 .bias-main p{font-size:13px;color:#475569;line-height:1.6}
 .bias-summary{font-size:12px;color:var(--dim);margin-top:8px;padding-top:8px;border-top:1px solid var(--border);line-height:1.6}
-.bias-port{min-width:180px}
-.port-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--dim);margin-bottom:8px}
-.port-item{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);gap:8px}
-.port-name{font-size:12px;color:var(--dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:120px}
+.bias-port{min-width:175px}
+.port-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--dim);margin-bottom:7px}
+.port-item{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid var(--border);gap:8px}
+.port-name{font-size:11px;color:var(--dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:115px}
 .badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;white-space:nowrap}
 .badge.buy{background:var(--green-bg);color:var(--green);border:1px solid var(--green-bd)}
 .badge.sell{background:var(--red-bg);color:var(--red);border:1px solid var(--red-bd)}
-.bias-chips{background:var(--bg);padding:12px 24px;display:flex;flex-wrap:wrap;gap:6px;border-top:1px solid var(--border)}
-.chip{font-size:11px;padding:4px 10px;border-radius:5px;font-weight:600}
+.bias-chips{background:var(--bg);padding:10px 22px;display:flex;flex-wrap:wrap;gap:6px;border-top:1px solid var(--border)}
+.chip{font-size:11px;padding:3px 9px;border-radius:5px;font-weight:600}
 .chip.buy{background:var(--green-bg);color:var(--green);border:1px solid var(--green-bd)}
 .chip.sell{background:var(--red-bg);color:var(--red);border:1px solid var(--red-bd)}
 
-/* ── Pulse row ── */
-.pulse-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
-.pulse-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px 16px;box-shadow:var(--shadow)}
-.p-lbl{font-size:11px;font-weight:600;color:var(--dim);margin-bottom:2px}
-.p-val{font-size:24px;font-weight:800;letter-spacing:-0.5px;line-height:1.1}
-.p-sub{font-size:12px;color:var(--dim);margin-top:3px}
+/* ── Pulse cards ── */
+.pulse-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.pulse-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:13px 15px;box-shadow:var(--shadow)}
+.p-lbl{font-size:10px;font-weight:600;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px}
+.p-val{font-size:23px;font-weight:800;letter-spacing:-.5px;line-height:1.1}
+.p-sub{font-size:11px;color:var(--dim);margin-top:3px}
 .p-explain{font-size:11px;color:var(--dim2);margin-top:6px;padding-top:6px;border-top:1px solid var(--border);line-height:1.4}
 .fg-bar{position:relative;height:6px;background:linear-gradient(to right,#ef4444,#fbbf24,#22c55e);border-radius:3px;margin:6px 0 4px}
 .fg-pin{position:absolute;width:3px;height:12px;background:#1e293b;border-radius:2px;top:-3px;transform:translateX(-50%);box-shadow:0 1px 3px rgba(0,0,0,.3)}
-
-/* ── Grids ── */
-.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:12px}
-.g2{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:12px}
-.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:12px}
-
-/* ── Market cards ── */
-.region{background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden;box-shadow:var(--shadow)}
-.reg-hdr{background:var(--surface2);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
-.reg-title{font-size:12px;font-weight:700;color:var(--text)}
-.reg-sub{font-size:11px;color:var(--dim)}
-.mrow{display:flex;justify-content:space-between;align-items:center;padding:9px 14px;border-bottom:1px solid var(--border);transition:background .15s}
-.mrow:last-child{border-bottom:none}
-.mrow:hover{background:var(--surface2)}
-.mname{font-size:13px;font-weight:500;color:var(--text)}
-.mprice{font-size:13px;font-weight:700;font-variant-numeric:tabular-nums;text-align:right}
-.mchg{font-size:11px;font-weight:600;text-align:right;font-variant-numeric:tabular-nums}
 .up{color:var(--green)}.down{color:var(--red)}.flat{color:var(--dim)}
 
-/* ── Crypto ── */
-.crypto-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
-.cc{background:#fff;border:1px solid var(--border);border-radius:9px;padding:12px 13px;box-shadow:var(--shadow);transition:.15s}
-.cc:hover{box-shadow:var(--shadow-md);border-color:var(--blue-bd)}
-.cc-top{display:flex;align-items:center;gap:7px;margin-bottom:6px}
-.cc-img{width:24px;height:24px;border-radius:50%}
-.cc-sym{font-size:13px;font-weight:700;color:var(--text)}
-.cc-rank{font-size:10px;color:var(--dim2)}
-.cc-price{font-size:14px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--text)}
-.cc-chg{font-size:11px;font-weight:600;margin-top:1px}
-.cc-week{font-size:10px;color:var(--dim);margin-top:2px}
-.cc-mcap{font-size:10px;color:var(--dim2);margin-top:3px}
+/* ── Grids ── */
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px}
+.g2{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:10px}
 
-/* ── Signals ── */
-.sig-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
-.sig-item{background:#fff;border:1px solid var(--border);border-radius:9px;padding:12px 14px;box-shadow:var(--shadow);display:flex;gap:10px;align-items:flex-start}
-.sig-item.bullish{border-left:3px solid var(--green)}
-.sig-item.bearish{border-left:3px solid var(--red)}
-.sig-item.risk-off{border-left:3px solid var(--yellow)}
-.sig-item.mixed{border-left:3px solid var(--blue)}
-.sig-item.contrarian-buy{border-left:3px solid #8b5cf6}
-.sig-item.neutral{border-left:3px solid var(--border2)}
-.sig-icon{font-size:18px;flex-shrink:0}
-.sig-text{font-size:12px;color:var(--text);line-height:1.5}
+/* ── Market region ── */
+.region{background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden;box-shadow:var(--shadow)}
+.reg-hdr{background:var(--surface2);padding:9px 13px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+.reg-title{font-size:12px;font-weight:700}.reg-sub{font-size:10px;color:var(--dim)}
+.mrow{display:flex;justify-content:space-between;align-items:center;padding:8px 13px;border-bottom:1px solid var(--border);transition:.15s}
+.mrow:last-child{border-bottom:none}.mrow:hover{background:var(--surface2)}
+.mname{font-size:12px;font-weight:500}
+.mprice{font-size:13px;font-weight:700;font-variant-numeric:tabular-nums;text-align:right}
+.mchg{font-size:11px;font-weight:600;text-align:right;font-variant-numeric:tabular-nums}
 
 /* ── Sektor heatmap ── */
-.sector-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:4px}
-.sector-card{border-radius:9px;padding:11px 12px;text-align:center;transition:.15s;cursor:default}
-.sector-card:hover{opacity:.85}
+.sector-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.sector-card{border-radius:9px;padding:11px 12px;text-align:center;transition:.15s}
 .sc-name{font-size:11px;font-weight:600;color:#fff;margin-bottom:4px;line-height:1.2}
 .sc-pct{font-size:16px;font-weight:800;color:#fff}
 .sc-day{font-size:10px;color:rgba(255,255,255,.75);margin-top:2px}
 
 /* ── Yield curve ── */
-.yc-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:16px 20px;box-shadow:var(--shadow)}
-.yc-title{font-size:12px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px}
+.yc-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:15px 18px;box-shadow:var(--shadow)}
+.yc-title{font-size:11px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px}
 .yc-bars{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
 .yc-row{display:flex;align-items:center;gap:10px}
-.yc-label{font-size:11px;color:var(--dim);width:36px;flex-shrink:0}
-.yc-bar-wrap{flex:1;background:var(--bg);border-radius:3px;height:10px;overflow:hidden}
-.yc-bar{height:100%;border-radius:3px;transition:.3s}
-.yc-val{font-size:12px;font-weight:700;width:44px;text-align:right}
-.yc-spread{font-size:13px;font-weight:700;padding:8px 12px;border-radius:7px;text-align:center;margin-top:6px}
-
-/* ── Ekonomisk kalender ── */
-.cal-list{display:flex;flex-direction:column;gap:6px}
-.cal-item{background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow)}
-.cal-impact{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.cal-impact.High{background:var(--red)}
-.cal-impact.Medium{background:var(--yellow)}
-.cal-date{font-size:11px;color:var(--dim);width:80px;flex-shrink:0}
-.cal-country{font-size:10px;font-weight:700;width:28px;flex-shrink:0}
-.cal-name{font-size:12px;font-weight:600;flex:1}
-.cal-vals{font-size:11px;color:var(--dim);text-align:right}
+.yc-lbl{font-size:11px;color:var(--dim);width:36px;flex-shrink:0}
+.yc-bw{flex:1;background:var(--bg);border-radius:3px;height:10px;overflow:hidden}
+.yc-b{height:100%;border-radius:3px;transition:.3s}
+.yc-v{font-size:12px;font-weight:700;width:44px;text-align:right}
+.yc-spread{font-size:12px;font-weight:700;padding:7px 12px;border-radius:7px;margin-top:6px}
 
 /* ── BTC dominans ── */
-.dom-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:16px 20px;box-shadow:var(--shadow)}
-.dom-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-.dom-bar-wrap{background:var(--bg);border-radius:4px;height:12px;overflow:hidden;margin-bottom:6px;display:flex}
+.dom-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:15px 18px;box-shadow:var(--shadow)}
+.dom-bar-wrap{background:var(--bg);border-radius:4px;height:12px;overflow:hidden;margin:8px 0 6px;display:flex}
 .dom-bar-btc{background:#f59e0b;height:100%}
 .dom-bar-eth{background:#6366f1;height:100%}
 .dom-bar-alt{background:var(--border2);height:100%;flex:1}
 
+/* ── Crypto ── */
+.crypto-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.cc{background:#fff;border:1px solid var(--border);border-radius:9px;padding:11px 12px;box-shadow:var(--shadow);transition:.15s}
+.cc:hover{box-shadow:var(--shadow-md);border-color:var(--blue-bd)}
+.cc-top{display:flex;align-items:center;gap:7px;margin-bottom:5px}
+.cc-img{width:22px;height:22px;border-radius:50%}
+.cc-sym{font-size:12px;font-weight:700}.cc-rank{font-size:10px;color:var(--dim2)}
+.cc-price{font-size:13px;font-weight:700;font-variant-numeric:tabular-nums}
+.cc-chg{font-size:11px;font-weight:600;margin-top:1px}
+.cc-week{font-size:10px;color:var(--dim);margin-top:2px}
+.cc-mcap{font-size:10px;color:var(--dim2);margin-top:2px}
+
+/* ── Signals ── */
+.sig-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}
+.sig-item{background:#fff;border:1px solid var(--border);border-radius:9px;padding:11px 13px;box-shadow:var(--shadow);display:flex;gap:9px;align-items:flex-start}
+.sig-item.bullish{border-left:3px solid var(--green)}.sig-item.bearish{border-left:3px solid var(--red)}
+.sig-item.risk-off{border-left:3px solid var(--yellow)}.sig-item.mixed{border-left:3px solid var(--blue)}
+.sig-item.contrarian-buy{border-left:3px solid #8b5cf6}.sig-item.neutral{border-left:3px solid var(--border2)}
+.sig-icon{font-size:16px;flex-shrink:0}.sig-text{font-size:12px;color:var(--text);line-height:1.5}
+
+/* ── Calendar ── */
+.cal-list{display:flex;flex-direction:column;gap:6px}
+.cal-item{background:#fff;border:1px solid var(--border);border-radius:8px;padding:9px 13px;display:flex;align-items:center;gap:11px;box-shadow:var(--shadow)}
+.cal-impact{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.cal-impact.High{background:var(--red)}.cal-impact.Medium{background:var(--yellow)}
+.cal-date{font-size:11px;color:var(--dim);width:78px;flex-shrink:0}
+.cal-country{font-size:11px;width:26px;flex-shrink:0}
+.cal-name{font-size:12px;font-weight:600;flex:1}
+.cal-vals{font-size:11px;color:var(--dim);text-align:right;min-width:80px}
+
 /* ── Insider ── */
 .ins-wrap{background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden;box-shadow:var(--shadow)}
-.ins-hdr{background:var(--surface2);padding:12px 16px;border-bottom:1px solid var(--border)}
-.ins-hdr h3{font-size:13px;font-weight:700;color:var(--text)}
-.ins-hdr p{font-size:11px;color:var(--dim);margin-top:2px}
+.ins-hdr{background:var(--surface2);padding:11px 15px;border-bottom:1px solid var(--border)}
+.ins-hdr h3{font-size:13px;font-weight:700}.ins-hdr p{font-size:11px;color:var(--dim);margin-top:2px}
 .ins-table{width:100%;border-collapse:collapse}
-.ins-table th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--dim);padding:8px 12px;text-align:left;border-bottom:1px solid var(--border);background:var(--surface2)}
-.ins-table td{padding:8px 12px;font-size:12px;border-bottom:1px solid var(--border);color:var(--text)}
-.ins-table tr:last-child td{border-bottom:none}
-.ins-table tr:hover td{background:var(--surface2)}
-.trade-b{background:var(--green-bg);color:var(--green);border:1px solid var(--green-bd);padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700}
-.trade-s{background:var(--red-bg);color:var(--red);border:1px solid var(--red-bd);padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700}
-.ins-footer{padding:10px 16px;background:var(--surface2);border-top:1px solid var(--border);font-size:11px;color:var(--dim)}
+.ins-table th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--dim);padding:7px 11px;text-align:left;border-bottom:1px solid var(--border);background:var(--surface2)}
+.ins-table td{padding:7px 11px;font-size:12px;border-bottom:1px solid var(--border);color:var(--text)}
+.ins-table tr:last-child td{border-bottom:none}.ins-table tr:hover td{background:var(--surface2)}
+.trade-b{background:var(--green-bg);color:var(--green);border:1px solid var(--green-bd);padding:2px 6px;border-radius:4px;font-size:10px;font-weight:700}
+.trade-s{background:var(--red-bg);color:var(--red);border:1px solid var(--red-bd);padding:2px 6px;border-radius:4px;font-size:10px;font-weight:700}
+.ins-foot{padding:9px 15px;background:var(--surface2);border-top:1px solid var(--border);font-size:11px;color:var(--dim)}
 
 /* ── Info box ── */
-.info-box{background:var(--blue-bg);border:1px solid var(--blue-bd);border-radius:8px;padding:12px 14px;font-size:12px;color:#1e40af;line-height:1.5;margin-bottom:12px}
+.info-box{background:var(--blue-bg);border:1px solid var(--blue-bd);border-radius:8px;padding:11px 13px;font-size:12px;color:#1e40af;line-height:1.5;margin-bottom:10px}
 .info-box strong{font-weight:700}
 
 /* ── Footer ── */
-.footer{text-align:center;padding:24px 0 12px;color:var(--dim2);font-size:11px;border-top:1px solid var(--border);margin-top:8px}
+.footer{text-align:center;padding:22px 0 10px;color:var(--dim2);font-size:11px;border-top:1px solid var(--border);margin-top:8px}
 
 /* ── Scrollbar ── */
-::-webkit-scrollbar{width:6px;height:6px}
-::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:var(--bg)}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
-::-webkit-scrollbar-thumb:hover{background:var(--dim2)}
 
 /* ── Responsive ── */
-@media(max-width:1200px){.crypto-grid{grid-template-columns:repeat(4,1fr)}.g4{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:900px){.bias-top{grid-template-columns:1fr}.g3{grid-template-columns:repeat(2,1fr)}.pulse-row{grid-template-columns:repeat(2,1fr)}.crypto-grid{grid-template-columns:repeat(3,1fr)}}
-@media(max-width:600px){.g3,.g4,.g2,.crypto-grid,.sig-grid{grid-template-columns:1fr}.pulse-row{grid-template-columns:1fr 1fr}}
+@media(max-width:1280px){.ind-grid{grid-template-columns:repeat(3,1fr)}.crypto-grid{grid-template-columns:repeat(4,1fr)}.g4{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:960px){.ind-grid{grid-template-columns:repeat(2,1fr)}.bias-top{grid-template-columns:1fr}.g3{grid-template-columns:1fr 1fr}.pulse-row{grid-template-columns:1fr 1fr}.sector-grid{grid-template-columns:repeat(4,1fr)}.crypto-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:600px){.ind-grid,.g3,.g4,.g2,.crypto-grid,.sig-grid,.sector-grid{grid-template-columns:1fr 1fr}.pulse-row{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
 
 <header class="hdr">
-  <div class="logo">Market<span>Pulse</span></div>
+  <div class="logo">MarketPulse <span>— Early Warning Dashboard</span></div>
   <div class="hdr-right">
-    <span class="upd" id="upd"><span class="live"></span>Indlæser...</span>
-    <button class="btn" onclick="loadData()">↻ Opdater nu</button>
+    <span class="upd" id="upd"><span class="live"></span>Klik Opdater for data</span>
+    <button class="btn" onclick="loadData()">↻ Opdater</button>
   </div>
 </header>
 
 <div class="wrap" id="root">
   <div class="loader">
     <div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
-    <span style="color:var(--dim);font-size:13px">Henter markedsdata fra hele verden...</span>
+    <span>Henter markedsdata fra hele verden...</span>
   </div>
 </div>
 
 <script>
 /* ─── helpers ─── */
 function fmt(p){
-  if(p==null) return "—";
-  if(p>=10000) return p.toLocaleString("da-DK",{maximumFractionDigits:0});
-  if(p>=1000)  return p.toLocaleString("da-DK",{maximumFractionDigits:0});
-  if(p>=100)   return p.toLocaleString("da-DK",{minimumFractionDigits:2,maximumFractionDigits:2});
-  if(p>=1)     return p.toLocaleString("da-DK",{minimumFractionDigits:3,maximumFractionDigits:3});
+  if(p==null)return"—";
+  if(p>=10000)return p.toLocaleString("da-DK",{maximumFractionDigits:0});
+  if(p>=1000) return p.toLocaleString("da-DK",{maximumFractionDigits:0});
+  if(p>=100)  return p.toLocaleString("da-DK",{minimumFractionDigits:2,maximumFractionDigits:2});
+  if(p>=1)    return p.toLocaleString("da-DK",{minimumFractionDigits:3,maximumFractionDigits:3});
   return p.toLocaleString("da-DK",{minimumFractionDigits:4,maximumFractionDigits:5});
 }
-function fmtC(p){
-  if(p==null) return "—";
-  if(p>=1000) return "$"+p.toLocaleString("da-DK",{maximumFractionDigits:0});
-  if(p>=1)    return "$"+p.toLocaleString("da-DK",{minimumFractionDigits:2,maximumFractionDigits:2});
-  return "$"+p.toFixed(5);
-}
-function fmtMcap(v){
-  if(!v) return "";
-  if(v>=1e12) return "$"+(v/1e12).toFixed(2)+"T";
-  if(v>=1e9)  return "$"+(v/1e9).toFixed(1)+"B";
-  return "$"+(v/1e6).toFixed(0)+"M";
-}
-function pct(v){ if(v==null)return"—"; return(v>0?"+":"")+v.toFixed(2)+"%" }
-function cls(v){ return v>0?"up":v<0?"down":"flat" }
-function arr(v){ return v>0?"▲":v<0?"▼":"●" }
+function fmtC(p){if(p==null)return"—";if(p>=1000)return"$"+p.toLocaleString("da-DK",{maximumFractionDigits:0});if(p>=1)return"$"+p.toLocaleString("da-DK",{minimumFractionDigits:2,maximumFractionDigits:2});return"$"+p.toFixed(5)}
+function fmtMcap(v){if(!v)return"";if(v>=1e12)return"$"+(v/1e12).toFixed(2)+"T";if(v>=1e9)return"$"+(v/1e9).toFixed(1)+"B";return"$"+(v/1e6).toFixed(0)+"M"}
+function pct(v){if(v==null)return"—";return(v>0?"+":"")+v.toFixed(2)+"%"}
+function cls(v){return v>0?"up":v<0?"down":"flat"}
+function arr(v){return v>0?"▲":v<0?"▼":"●"}
 
-/* ─── Bias hero ─── */
+/* ═══════════════════════════
+   EARLY WARNING SYSTEM
+═══════════════════════════ */
+function healthColor(score){
+  if(score>=70)return"#4ade80";
+  if(score>=50)return"#fbbf24";
+  if(score>=35)return"#fb923c";
+  return"#f87171";
+}
+function healthLabel(score){
+  if(score>=70)return"SUNDT";
+  if(score>=50)return"NEUTRALT";
+  if(score>=35)return"FORSIGTIG";
+  return"ADVARSEL";
+}
+function healthDesc(score){
+  if(score>=70)return"Størstedelen af de ledende indikatorer er positive. Institutioner er ikke i defensiv mode.";
+  if(score>=50)return"Blandede signaler. Hverken klart bullish eller bearish. Afvent klarere retning.";
+  if(score>=35)return"Flere indikatorer viser stress. De professionelle begynder at positionere sig defensivt.";
+  return"Multipple advarsler aktive. Institutioner reducerer risiko. Vær forsigtig med ny eksponering.";
+}
+
+function renderEarlyWarnings(ew){
+  if(!ew||!ew.indicators?.length) return "";
+  const score = ew.health_score??50;
+  const color = healthColor(score);
+  const label = healthLabel(score);
+  const desc  = healthDesc(score);
+  const barW  = score;
+  const barColor = score>=70?"#4ade80":score>=50?"#fbbf24":"#f87171";
+
+  const cards = ew.indicators.map(ind=>{
+    const valStr = ind.value_str ?? (ind.price!=null ? fmt(ind.price) : pct(ind.week_pct));
+    const chgCls = ind.change_pct>0?"up":ind.change_pct<0?"down":"flat";
+    return `<div class="ind-card ${ind.signal}">
+      <div class="ind-top">
+        <span class="ind-icon">${ind.icon}</span>
+        <span class="ind-signal ${ind.signal}">${ind.label.toUpperCase()}</span>
+      </div>
+      <div class="ind-name">${ind.name}</div>
+      <div class="ind-sub">${ind.subtitle}</div>
+      <div class="ind-value">${valStr}</div>
+      <div class="ind-chg ${chgCls}">${arr(ind.change_pct)} ${pct(ind.change_pct)} dag${ind.week_pct&&ind.id!=="yc"?" · "+pct(ind.week_pct)+" uge":""}</div>
+      <hr class="ind-divider">
+      <div class="ind-explain">${ind.explanation}</div>
+    </div>`;
+  }).join("");
+
+  return `<div class="ew-hero">
+    <div class="ew-hero-top">
+      <div class="ew-title-block">
+        <h1>⚡ Early Warning Indikatorer</h1>
+        <p>Disse signaler bevæger sig FØR markedet — det er her institutionerne ser, hvad der kommer</p>
+      </div>
+      <div class="health-score-wrap">
+        <div class="health-gauge">
+          <div class="health-num" style="color:${color}">${score}</div>
+          <div class="health-lbl" style="color:${color}">${label}</div>
+          <div class="health-bar-outer" style="margin-top:5px">
+            <div class="health-bar-inner" style="width:${barW}%;background:${barColor}"></div>
+          </div>
+        </div>
+        <div class="health-desc">${desc}</div>
+      </div>
+    </div>
+    <div class="ind-grid">${cards}</div>
+  </div>`;
+}
+
+/* ═══════════════════════════
+   BIAS CARD
+═══════════════════════════ */
 function renderBias(a){
-  if(!a) return "";
-  const icon = a.overall==="BULLISH"?"▲":a.overall==="BEARISH"?"▼":"●";
-  const scoreSign = a.score>0?"+":"";
-  const scoreColor = a.score>0?"var(--green)":a.score<0?"var(--red)":"var(--yellow)";
-  const portRows = [
+  if(!a)return"";
+  const icon=a.overall==="BULLISH"?"▲":a.overall==="BEARISH"?"▼":"●";
+  const sc=a.score>0?"+":"";
+  const sc_col=a.score>0?"var(--green)":a.score<0?"var(--red)":"var(--yellow)";
+  const portRows=[
     ...(a.buy_assets||[]).slice(0,4).map(x=>`<div class="port-item"><span class="port-name">${x}</span><span class="badge buy">KØB</span></div>`),
     ...(a.sell_assets||[]).slice(0,2).map(x=>`<div class="port-item"><span class="port-name">${x.slice(0,24)}</span><span class="badge sell">REDUCER</span></div>`),
   ].join("")||'<div style="font-size:11px;color:var(--dim2)">Ingen klare signaler</div>';
@@ -268,7 +356,7 @@ function renderBias(a){
       <div class="bias-badge ${a.overall}">
         <div class="bias-lbl">Ugens retning</div>
         <div class="bias-val ${a.overall}">${icon} ${a.overall}</div>
-        <div class="bias-score" style="color:${scoreColor}">Score: ${scoreSign}${a.score} &nbsp;(${a.bull_count} op / ${a.bear_count} ned)</div>
+        <div class="bias-score" style="color:${sc_col}">Score: ${sc}${a.score} (${a.bull_count}↑ / ${a.bear_count}↓)</div>
       </div>
       <div class="bias-main">
         <h2>Hvad sker der i markedet?</h2>
@@ -276,347 +364,211 @@ function renderBias(a){
         <div class="bias-summary">${a.summary||""}</div>
       </div>
       <div class="bias-port">
-        <div class="port-title">Din portefølje</div>
-        ${portRows}
+        <div class="port-title">Portfolio signal</div>${portRows}
       </div>
     </div>
     ${buys||sells?`<div class="bias-chips">${buys}${sells}</div>`:""}
   </div>`;
 }
 
-/* ─── Pulse row ─── */
-function renderPulse(markets, fg){
-  const vix = (markets?.us||{})["VIX"]||{};
-  const dxy = (markets?.forex||{})["DXY"]||{};
-  const t10 = (markets?.bonds||{})["US 10Y"]||{};
-  const fgv = fg?.today?.value??50;
-  const fgl = fg?.today?.label??"Neutral";
-  const fgy = fg?.yesterday?.value;
-  const fgtrend = fgy!=null?(fgv>fgy?" ↑":fgv<fgy?" ↓":""):"";
-  const fgColor = fgv<25?"var(--red)":fgv<45?"var(--yellow)":fgv<55?"var(--dim)":"var(--green)";
-
-  const vixExplain = vix.price>30
-    ? "Meget høj — markedet er bange. Store udsving kan forventes."
-    : vix.price>20
-    ? "Forhøjet — der er usikkerhed ude. Hold øje med nyheder."
-    : "Lav — markedet er roligt. Institutioner er ikke nervøse.";
-
-  const fgExplain = fgv<25
-    ? "Ekstrem frygt — historisk set er dette ofte et godt tidspunkt at købe."
-    : fgv<45
-    ? "Frygt dominerer — investorer er forsigtige og nervøse."
-    : fgv<55
-    ? "Neutralt — hverken begejstring eller panik."
-    : fgv<75
-    ? "Grådighed — optimisme i markedet, vær opmærksom."
-    : "Ekstrem grådighed — markedet er euphoric. Vær forsigtig.";
-
-  const dxyExplain = (dxy.week_pct||0)>1
-    ? "Dollar styrkes — typisk negativt for guld og råvarer."
-    : (dxy.week_pct||0)<-1
-    ? "Dollar svækkes — godt for guld, råvarer og eksporterende lande."
-    : "Dollar relativt stabil denne uge.";
-
-  const t10Explain = (t10.price||0)>5
-    ? "Meget høj rente — dyre lån, pres på aktier med høj gæld."
-    : (t10.price||0)>4
-    ? "Høj rente — obligationer konkurrerer med aktier."
-    : "Moderat rente — relativt positivt for aktiemarkedet.";
-
+/* ── Pulse row ── */
+function renderPulse(m,fg){
+  const vix=(m?.us||{})["VIX"]||{};
+  const dxy=(m?.forex||{})["DXY"]||{};
+  const t10=(m?.bonds||{})["US 10Y"]||{};
+  const fgv=fg?.today?.value??50, fgl=fg?.today?.label??"Neutral", fgy=fg?.yesterday?.value;
+  const fgtr=fgy!=null?(fgv>fgy?" ↑":fgv<fgy?" ↓":""):"";
+  const fgCol=fgv<25?"var(--red)":fgv<45?"var(--yellow)":fgv<55?"var(--dim)":"var(--green)";
+  const vixEx=vix.price>30?"Meget høj — markedet er bange. Store udsving kan forventes.":vix.price>20?"Forhøjet — usikkerhed til stede. Hold øje med nyheder.":"Lav — markedet er roligt. Institutioner hedger ikke.";
+  const dxyEx=(dxy.week_pct||0)>1?"Dollar styrkes — typisk negativt for guld og råvarer.":(dxy.week_pct||0)<-1?"Dollar svækkes — godt for guld, råvarer og eksportlande.":"Dollar relativt stabil denne uge.";
+  const t10Ex=(t10.price||0)>5?"Meget høj rente — dyre lån, pres på vækstaktier.":(t10.price||0)>4?"Høj rente — obligationer konkurrerer med aktier.":"Moderat rente — relativt positivt for aktiemarkedet.";
+  const fgEx=fgv<25?"Ekstrem frygt — historisk ofte et godt tidspunkt at købe.":fgv<45?"Frygt dominerer — investorer er forsigtige.":fgv<55?"Neutralt — hverken begejstring eller panik.":fgv<75?"Grådighed — optimisme i markedet.":"Ekstrem grådighed — vær forsigtig.";
   return `<div class="pulse-row">
-    <div class="pulse-card">
-      <div class="p-lbl">Fear &amp; Greed Index</div>
-      <div class="p-val" style="color:${fgColor}">${fgv}${fgtrend}</div>
-      <div class="p-sub">${fgl}${fgy!=null?` (i går: ${fgy})`:""}  </div>
-      <div class="fg-bar"><div class="fg-pin" style="left:${fgv}%"></div></div>
-      <div class="p-explain">${fgExplain}</div>
-    </div>
-    <div class="pulse-card">
-      <div class="p-lbl">VIX — Markedsangst</div>
-      <div class="p-val ${cls(-(vix.change_pct||0))}">${vix.price!=null?vix.price.toFixed(1):"—"}</div>
-      <div class="p-sub ${cls(vix.change_pct)}">${arr(vix.change_pct)} ${pct(vix.change_pct)} i dag</div>
-      <div class="p-explain">${vixExplain}</div>
-    </div>
-    <div class="pulse-card">
-      <div class="p-lbl">USD Index (DXY)</div>
-      <div class="p-val ${cls(dxy.change_pct)}">${dxy.price!=null?dxy.price.toFixed(2):"—"}</div>
-      <div class="p-sub ${cls(dxy.change_pct)}">${arr(dxy.change_pct)} ${pct(dxy.change_pct)} dag · ${pct(dxy.week_pct)} uge</div>
-      <div class="p-explain">${dxyExplain}</div>
-    </div>
-    <div class="pulse-card">
-      <div class="p-lbl">US 10-årig Rente</div>
-      <div class="p-val ${cls(t10.change_pct)}">${t10.price!=null?t10.price.toFixed(2)+"%":"—"}</div>
-      <div class="p-sub ${cls(t10.change_pct)}">${arr(t10.change_pct)} ${pct(t10.change_pct)} i dag</div>
-      <div class="p-explain">${t10Explain}</div>
-    </div>
+    <div class="pulse-card"><div class="p-lbl">Fear &amp; Greed Index</div><div class="p-val" style="color:${fgCol}">${fgv}${fgtr}</div><div class="p-sub">${fgl}${fgy!=null?` (i går: ${fgy})`:""}</div><div class="fg-bar"><div class="fg-pin" style="left:${fgv}%"></div></div><div class="p-explain">${fgEx}</div></div>
+    <div class="pulse-card"><div class="p-lbl">VIX — Markedsangst</div><div class="p-val ${cls(-(vix.change_pct||0))}">${vix.price!=null?vix.price.toFixed(1):"—"}</div><div class="p-sub ${cls(vix.change_pct)}">${arr(vix.change_pct)} ${pct(vix.change_pct)} i dag</div><div class="p-explain">${vixEx}</div></div>
+    <div class="pulse-card"><div class="p-lbl">USD Index (DXY)</div><div class="p-val ${cls(dxy.change_pct)}">${dxy.price!=null?dxy.price.toFixed(2):"—"}</div><div class="p-sub ${cls(dxy.change_pct)}">${arr(dxy.change_pct)} ${pct(dxy.change_pct)} dag · ${pct(dxy.week_pct)} uge</div><div class="p-explain">${dxyEx}</div></div>
+    <div class="pulse-card"><div class="p-lbl">US 10-årig Rente</div><div class="p-val ${cls(t10.change_pct)}">${t10.price!=null?t10.price.toFixed(2)+"%":"—"}</div><div class="p-sub ${cls(t10.change_pct)}">${arr(t10.change_pct)} ${pct(t10.change_pct)} i dag</div><div class="p-explain">${t10Ex}</div></div>
   </div>`;
 }
 
-/* ─── Market region ─── */
-function renderRegion(title, emoji, data, note){
-  if(!data||!Object.keys(data).length) return "";
-  const rows = Object.entries(data).filter(([n])=>n!=="VIX").map(([name,d])=>`
-    <div class="mrow">
-      <span class="mname">${name}</span>
-      <div>
-        <div class="mprice">${fmt(d.price)}</div>
-        <div class="mchg ${cls(d.change_pct)}">${arr(d.change_pct)} ${pct(d.change_pct)} <span style="color:var(--dim2)">(${pct(d.week_pct)} uge)</span></div>
-      </div>
-    </div>`).join("");
-  return `<div class="region">
-    <div class="reg-hdr"><span class="reg-title">${emoji} ${title}</span>${note?`<span class="reg-sub">${note}</span>`:""}
-    </div>${rows}
+/* ── Market region ── */
+function renderRegion(title,emoji,data,note){
+  if(!data||!Object.keys(data).length)return"";
+  const rows=Object.entries(data).filter(([n])=>n!=="VIX").map(([name,d])=>`
+    <div class="mrow"><span class="mname">${name}</span><div>
+      <div class="mprice">${fmt(d.price)}</div>
+      <div class="mchg ${cls(d.change_pct)}">${arr(d.change_pct)} ${pct(d.change_pct)} <span style="color:var(--dim2)">(${pct(d.week_pct)} uge)</span></div>
+    </div></div>`).join("");
+  return `<div class="region"><div class="reg-hdr"><span class="reg-title">${emoji} ${title}</span>${note?`<span class="reg-sub">${note}</span>`:""}</div>${rows}</div>`;
+}
+
+/* ── Sektor heatmap ── */
+function sCol(p){if(p>=3)return"#15803d";if(p>=1)return"#22c55e";if(p>=0)return"#86efac";if(p>=-1)return"#fca5a5";if(p>=-3)return"#ef4444";return"#b91c1c"}
+function renderSectors(s){
+  if(!s||!Object.keys(s).length)return"";
+  const sorted=Object.entries(s).sort((a,b)=>(b[1].week_pct||0)-(a[1].week_pct||0));
+  const best=sorted[0]?.[0]||"", worst=sorted[sorted.length-1]?.[0]||"";
+  return `<div class="info-box"><strong>Sektorrotation:</strong> Mørk grøn = kapital strømmer ind. Mørk rød = kapital forlader sektoren. Denne uge fører <strong>${best}</strong> — og <strong>${worst}</strong> er bagud.</div>
+  <div class="sector-grid">${sorted.map(([n,d])=>`<div class="sector-card" style="background:${sCol(d.week_pct||0)}"><div class="sc-name">${n}</div><div class="sc-pct">${pct(d.week_pct)}</div><div class="sc-day">dag: ${pct(d.change_pct)}</div></div>`).join("")}</div>`;
+}
+
+/* ── Yield curve ── */
+function renderYC(yc){
+  if(!yc||!yc.t2)return"";
+  const mx=Math.max(yc.t2,yc.t10,yc.t30,6);
+  const bar=v=>`<div class="yc-b" style="width:${(v/mx*100).toFixed(1)}%;background:${v>0?"var(--blue)":"var(--red)"}"></div>`;
+  const sc=yc.inverted?"background:var(--red-bg);color:var(--red);border:1px solid var(--red-bd)":"background:var(--green-bg);color:var(--green);border:1px solid var(--green-bd)";
+  const txt=yc.inverted?`INVERTERET (${yc.spread}%) — 2Y rente over 10Y. Historisk recession-signal inden for 12-18 måneder.`:`Normal (+${yc.spread}%) — 10Y over 2Y. Sundt og normalt.`;
+  return `<div class="yc-card"><div class="yc-title">Rentekurven (Yield Curve)</div>
+    <div class="yc-bars">
+      <div class="yc-row"><span class="yc-lbl">2 år</span><div class="yc-bw">${bar(yc.t2)}</div><span class="yc-v up">${yc.t2}%</span></div>
+      <div class="yc-row"><span class="yc-lbl">10 år</span><div class="yc-bw">${bar(yc.t10)}</div><span class="yc-v up">${yc.t10}%</span></div>
+      <div class="yc-row"><span class="yc-lbl">30 år</span><div class="yc-bw">${bar(yc.t30)}</div><span class="yc-v up">${yc.t30}%</span></div>
+    </div>
+    <div class="yc-spread" style="${sc}">${txt}</div>
   </div>`;
 }
 
-/* ─── Signals ─── */
-function renderSignals(analysis){
-  if(!analysis?.signals?.length) return "";
-  const items = analysis.signals.map(s=>`
-    <div class="sig-item ${s.type}">
-      <span class="sig-icon">${s.icon}</span>
-      <span class="sig-text">${s.text}</span>
-    </div>`).join("");
-  return `
-  <div class="info-box">
-    <strong>Hvad kigger professionelle investorer på?</strong> Disse signaler er baseret på prisudvikling,
-    volatilitet og markedsstruktur — de samme ting som institutionelle investorer bruger til at tage
-    beslutninger. Røde streger = advarsel. Grønne streger = positivt signal.
-  </div>
-  <div class="sig-grid">${items}</div>`;
+/* ── BTC dominans ── */
+function renderDom(dom){
+  if(!dom||!dom.btc)return"";
+  const alt=Math.max(0,100-dom.btc-dom.eth);
+  const mcap=dom.total_mcap>=1e12?"$"+(dom.total_mcap/1e12).toFixed(2)+"T":"$"+(dom.total_mcap/1e9).toFixed(0)+"B";
+  const ex=dom.btc>60?"BTC dominans høj — penge sidder i Bitcoin, altcoins er upopulære. Defensivt krypto-marked.":dom.btc>50?"Moderat BTC dominans — relativt konservativt marked.":"BTC dominans lav — kapital roterer til altcoins. Spekulativ stemning (altseason).";
+  return `<div class="dom-card"><div class="yc-title">Krypto Markedsandel</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><span style="font-size:13px;font-weight:700">Total: ${mcap}</span><span class="${cls(dom.change_24h)}" style="font-size:12px">${arr(dom.change_24h)} ${pct(dom.change_24h)} i dag</span></div>
+    <div class="dom-bar-wrap"><div class="dom-bar-btc" style="width:${dom.btc}%"></div><div class="dom-bar-eth" style="width:${dom.eth}%"></div><div class="dom-bar-alt"></div></div>
+    <div style="display:flex;gap:14px;font-size:11px;margin-bottom:8px">
+      <span><span style="color:#f59e0b;font-weight:700">■</span> BTC ${dom.btc}%</span>
+      <span><span style="color:#6366f1;font-weight:700">■</span> ETH ${dom.eth}%</span>
+      <span><span style="color:var(--dim2);font-weight:700">■</span> Alt ${alt.toFixed(1)}%</span>
+    </div>
+    <div style="font-size:11px;color:var(--dim)">${ex}</div>
+  </div>`;
 }
 
-/* ─── Crypto ─── */
-function renderCrypto(crypto){
-  if(!crypto||!Object.keys(crypto).length) return "";
+/* ── Crypto ── */
+function renderCrypto(c){
+  if(!c||!Object.keys(c).length)return"";
   let cards="",i=0;
-  for(const [sym,d] of Object.entries(crypto)){
-    if(i++>=12) break;
-    cards+=`<div class="cc">
-      <div class="cc-top">
-        <img class="cc-img" src="${d.image}" alt="${sym}" onerror="this.style.display='none'">
-        <div><div class="cc-sym">${sym}</div><div class="cc-rank">#${d.rank} markedsværdi</div></div>
-      </div>
+  for(const [sym,d] of Object.entries(c)){if(i++>=12)break;
+    cards+=`<div class="cc"><div class="cc-top"><img class="cc-img" src="${d.image}" alt="${sym}" onerror="this.style.display='none'"><div><div class="cc-sym">${sym}</div><div class="cc-rank">#${d.rank}</div></div></div>
       <div class="cc-price">${fmtC(d.price)}</div>
-      <div class="cc-chg ${cls(d.change_pct)}">${arr(d.change_pct)} ${pct(d.change_pct)} i dag</div>
+      <div class="cc-chg ${cls(d.change_pct)}">${arr(d.change_pct)} ${pct(d.change_pct)}</div>
       <div class="cc-week">Uge: <span class="${cls(d.week_pct)}">${pct(d.week_pct)}</span></div>
       <div class="cc-mcap">${fmtMcap(d.market_cap)}</div>
     </div>`;
   }
-  return `<div class="info-box" style="margin-top:4px">
-    <strong>Krypto som markedsindikator:</strong> Når Bitcoin og Ethereum stiger kraftigt er det typisk et tegn på
-    "risk-on" — investorer tager risiko. Falder de markant, søger markedet mod sikkerhed.
-  </div>
-  <div class="crypto-grid">${cards}</div>`;
+  return`<div class="crypto-grid">${cards}</div>`;
 }
 
-/* ─── Insider trades ─── */
-function renderInsider(trades){
-  const expl = `<div class="ins-hdr">
-    <h3>Insider-handler — de seneste 7 dage</h3>
-    <p>Insiders er direktører, bestyrelsesmedlemmer og store aktionærer. De ved mere end os — og de må kun handle på offentlig information. Køber en CEO aktier i sit eget selskab er det et stærkt signal.</p>
-  </div>`;
-  if(!trades?.length) return `<div class="ins-wrap">${expl}<div style="padding:16px;color:var(--dim);font-size:12px">Ingen insider-handler fundet for de seneste 7 dage.</div></div>`;
-  const rows = trades.slice(0,15).map(t=>`<tr>
-    <td style="color:var(--dim)">${t.date}</td>
-    <td><strong style="color:var(--blue)">${t.ticker}</strong></td>
-    <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t.company}</td>
-    <td style="color:var(--dim)">${t.title}</td>
-    <td><span class="${t.is_buy?"trade-b":"trade-s"}">${t.type}</span></td>
-    <td class="${t.is_buy?"up":"down"}">${t.price}</td>
-    <td style="color:var(--dim)">${t.qty}</td>
-    <td class="${t.is_buy?"up":"down"}" style="font-weight:700">${t.value}</td>
-  </tr>`).join("");
-  return `<div class="ins-wrap">${expl}
-    <div style="overflow-x:auto">
-      <table class="ins-table">
-        <thead><tr><th>Dato</th><th>Aktie</th><th>Selskab</th><th>Titel</th><th>Type</th><th>Pris</th><th>Antal</th><th>Samlet værdi</th></tr></thead>
-        <tbody>${rows}</tbody>
-      </table>
-    </div>
-    <div class="ins-footer">Kilde: OpenInsider.com · P = Purchase (køb) er det stærkeste signal — insiders køber kun fordi de tror kursen stiger</div>
-  </div>`;
+/* ── Signals ── */
+function renderSignals(a){
+  if(!a?.signals?.length)return"";
+  return`<div class="sig-grid">${a.signals.map(s=>`<div class="sig-item ${s.type}"><span class="sig-icon">${s.icon}</span><span class="sig-text">${s.text}</span></div>`).join("")}</div>`;
 }
 
-/* ─── Sektor rotation ─── */
-function sectorColor(pct){
-  if(pct>=3)  return "#15803d";
-  if(pct>=1)  return "#22c55e";
-  if(pct>=0)  return "#86efac";
-  if(pct>=-1) return "#fca5a5";
-  if(pct>=-3) return "#ef4444";
-  return "#b91c1c";
-}
-function renderSectors(sectors){
-  if(!sectors||!Object.keys(sectors).length) return "";
-  const sorted = Object.entries(sectors).sort((a,b)=>(b[1].week_pct||0)-(a[1].week_pct||0));
-  const cards = sorted.map(([name,d])=>`
-    <div class="sector-card" style="background:${sectorColor(d.week_pct||0)}">
-      <div class="sc-name">${name}</div>
-      <div class="sc-pct">${pct(d.week_pct)}</div>
-      <div class="sc-day">i dag: ${pct(d.change_pct)}</div>
-    </div>`).join("");
-  const best = sorted[0]?.[0]||"";
-  const worst = sorted[sorted.length-1]?.[0]||"";
-  return `
-  <div class="info-box">
-    <strong>Sektorrotation viser præcis hvor pengene bevæger sig.</strong> Mørk grøn = kapitalen strømmer ind.
-    Mørk rød = kapitalen forlader sektoren. Denne uge fører <strong>${best}</strong> — og
-    <strong>${worst}</strong> er bagud. Institutioner bruger sektorrotation til at se hvad markedet "tror på".
-  </div>
-  <div class="sector-grid">${cards}</div>`;
-}
-
-/* ─── Rentekurve ─── */
-function renderYieldCurve(yc){
-  if(!yc||!yc.t2) return "";
-  const max = Math.max(yc.t2, yc.t10, yc.t30, 6);
-  const bar = (v) => `<div class="yc-bar" style="width:${(v/max*100).toFixed(1)}%;background:${v>0?"var(--blue)":"var(--red)"}"></div>`;
-  const spreadColor = yc.inverted ? "var(--red-bg);color:var(--red);border:1px solid var(--red-bd)" : "var(--green-bg);color:var(--green);border:1px solid var(--green-bd)";
-  const spreadText = yc.inverted
-    ? `INVERTERET (${yc.spread}%) — 2Y renten er højere end 10Y. Dette er historisk set en advarsel om recession inden for 12-18 måneder.`
-    : `Normal kurve (spread +${yc.spread}%) — 10Y renten er højere end 2Y. Det er sundt og normalt.`;
-  return `<div class="yc-card">
-    <div class="yc-title">Rentekurven (Yield Curve)</div>
-    <div class="yc-bars">
-      <div class="yc-row"><span class="yc-label">2 år</span><div class="yc-bar-wrap">${bar(yc.t2)}</div><span class="yc-val ${yc.t2>0?"up":"down"}">${yc.t2}%</span></div>
-      <div class="yc-row"><span class="yc-label">10 år</span><div class="yc-bar-wrap">${bar(yc.t10)}</div><span class="yc-val ${yc.t10>0?"up":"down"}">${yc.t10}%</span></div>
-      <div class="yc-row"><span class="yc-label">30 år</span><div class="yc-bar-wrap">${bar(yc.t30)}</div><span class="yc-val ${yc.t30>0?"up":"down"}">${yc.t30}%</span></div>
-    </div>
-    <div class="yc-spread" style="background:${spreadColor}">${spreadText}</div>
-  </div>`;
-}
-
-/* ─── BTC dominans ─── */
-function renderBTCDom(dom){
-  if(!dom||!dom.btc) return "";
-  const alt = Math.max(0, 100-dom.btc-dom.eth);
-  const mcapStr = dom.total_mcap>=1e12?"$"+(dom.total_mcap/1e12).toFixed(2)+"T":"$"+(dom.total_mcap/1e9).toFixed(0)+"B";
-  const domExplain = dom.btc>60
-    ? "Bitcoin dominerer — penge er i BTC, altcoins er upopulære. Typisk i usikre tider."
-    : dom.btc>50
-    ? "Bitcoin stærk dominans — markedet er relativt konservativt i krypto."
-    : "Bitcoin dominans lav — kapital roterer til altcoins. Typisk 'altseason' eller spekulativ stemning.";
-  return `<div class="dom-card">
-    <div class="yc-title">Krypto Markedsandel (Dominans)</div>
-    <div class="dom-row">
-      <span style="font-size:13px;font-weight:700">Samlet krypto markedsværdi: <span class="${cls(dom.change_24h)}">${mcapStr}</span> <span style="font-size:11px;color:var(--dim)">(${pct(dom.change_24h)} i dag)</span></span>
-    </div>
-    <div class="dom-bar-wrap">
-      <div class="dom-bar-btc" style="width:${dom.btc}%"></div>
-      <div class="dom-bar-eth" style="width:${dom.eth}%"></div>
-      <div class="dom-bar-alt" style="width:${alt}%"></div>
-    </div>
-    <div style="display:flex;gap:16px;font-size:11px;margin-bottom:8px">
-      <span><span style="color:#f59e0b;font-weight:700">■</span> Bitcoin ${dom.btc}%</span>
-      <span><span style="color:#6366f1;font-weight:700">■</span> Ethereum ${dom.eth}%</span>
-      <span><span style="color:var(--dim2);font-weight:700">■</span> Altcoins ${alt.toFixed(1)}%</span>
-    </div>
-    <div style="font-size:11px;color:var(--dim)">${domExplain}</div>
-  </div>`;
-}
-
-/* ─── Ekonomisk kalender ─── */
+/* ── Calendar ── */
 function renderCalendar(events){
-  if(!events?.length) return `<div class="info-box">Ingen vigtige begivenheder fundet for denne uge.</div>`;
-  const now = new Date();
-  const items = events.slice(0,20).map(e=>{
-    const d = new Date(e.date);
-    const isPast = d < now;
-    const dateStr = d.toLocaleDateString("da-DK",{weekday:"short",month:"short",day:"numeric"});
-    const timeStr = d.toLocaleTimeString("da-DK",{hour:"2-digit",minute:"2-digit"});
-    const flags = {"USD":"🇺🇸","EUR":"🇪🇺","GBP":"🇬🇧","JPY":"🇯🇵","CNY":"🇨🇳"};
-    return `<div class="cal-item" style="${isPast?"opacity:.55":""}">
-      <div class="cal-impact ${e.impact}"></div>
-      <div class="cal-date">${dateStr} ${timeStr}</div>
-      <div class="cal-country">${flags[e.country]||e.country}</div>
-      <div class="cal-name">${e.title}${isPast?' <span style="font-size:10px;color:var(--dim)">(afsluttet)</span>':''}</div>
-      <div class="cal-vals">
-        ${e.forecast?`<div>Forventet: <strong>${e.forecast}</strong></div>`:""}
-        ${e.previous?`<div style="color:var(--dim2)">Forrige: ${e.previous}</div>`:""}
-      </div>
-    </div>`;
-  }).join("");
-  return `<div class="info-box">
-    <strong>Kommende markedsbevægende begivenheder.</strong> Rød prik = høj impact (Fed, CPI, jobs-rapport).
-    Gul prik = medium impact. Institutioner positionerer sig <em>inden</em> disse tal kommer ud — så du bør kende dem.
-  </div>
-  <div class="cal-list">${items}</div>`;
+  if(!events?.length)return`<div style="color:var(--dim);font-size:12px">Ingen vigtige begivenheder fundet for denne uge.</div>`;
+  const now=new Date();
+  const flags={"USD":"🇺🇸","EUR":"🇪🇺","GBP":"🇬🇧","JPY":"🇯🇵","CNY":"🇨🇳"};
+  return`<div class="cal-list">${events.slice(0,18).map(e=>{
+    const d=new Date(e.date),past=d<now;
+    const ds=d.toLocaleDateString("da-DK",{weekday:"short",month:"short",day:"numeric"});
+    const ts=d.toLocaleTimeString("da-DK",{hour:"2-digit",minute:"2-digit"});
+    return`<div class="cal-item" style="${past?"opacity:.5":""}"><div class="cal-impact ${e.impact}"></div><div class="cal-date">${ds} ${ts}</div><div class="cal-country">${flags[e.country]||e.country}</div><div class="cal-name">${e.title}${past?' <span style="font-size:10px;color:var(--dim)">(afsluttet)</span>':''}</div><div class="cal-vals">${e.forecast?`<div>Forv: <strong>${e.forecast}</strong></div>`:""}${e.previous?`<div>Forrige: ${e.previous}</div>`:""}</div></div>`;
+  }).join("")}</div>`;
 }
 
-/* ─── Main render ─── */
+/* ── Insider ── */
+function renderInsider(t){
+  const hdr=`<div class="ins-hdr"><h3>Insider-handler — seneste 7 dage</h3><p>Direktører og bestyrelsesmedlemmer der køber i eget selskab er et stærkt signal — de ved mere end markedet.</p></div>`;
+  if(!t?.length)return`<div class="ins-wrap">${hdr}<div style="padding:14px;color:var(--dim);font-size:12px">Ingen handler fundet.</div></div>`;
+  const rows=t.slice(0,15).map(r=>`<tr><td style="color:var(--dim)">${r.date}</td><td><strong style="color:var(--blue)">${r.ticker}</strong></td><td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.company}</td><td style="color:var(--dim)">${r.title}</td><td><span class="${r.is_buy?"trade-b":"trade-s"}">${r.type}</span></td><td class="${r.is_buy?"up":"down"}">${r.price}</td><td style="color:var(--dim)">${r.qty}</td><td class="${r.is_buy?"up":"down"}" style="font-weight:700">${r.value}</td></tr>`).join("");
+  return`<div class="ins-wrap">${hdr}<div style="overflow-x:auto"><table class="ins-table"><thead><tr><th>Dato</th><th>Aktie</th><th>Selskab</th><th>Titel</th><th>Type</th><th>Pris</th><th>Antal</th><th>Værdi</th></tr></thead><tbody>${rows}</tbody></table></div><div class="ins-foot">Kilde: OpenInsider.com · P = Purchase (køb) — det stærkeste insider-signal</div></div>`;
+}
+
+/* ═══════════════════════════
+   MAIN RENDER
+═══════════════════════════ */
 function renderAll(data){
   const m=data.markets||{}, c=data.crypto||{}, fg=data.fear_greed||{};
   const a=data.analysis||{}, ins=data.insider_trades||[];
   const cal=data.calendar||[], dom=data.btc_dominance||{};
-  let html="";
+  const ew=data.early_warnings||{};
+  let h="";
 
-  html+=renderBias(a);
-  html+=renderPulse(m,fg);
+  // ① Early warnings øverst
+  h+=renderEarlyWarnings(ew);
 
-  html+=`<div class="sec-label">Hvad sker der i de professionelles markeder</div>`;
-  html+=renderSignals(a);
+  // ② Dagligt bias + portfolio signal
+  h+=`<div class="sec">Daglig markedsretning & portfolio signal</div>`;
+  h+=renderBias(a);
 
-  html+=`<div class="sec-label">Globale aktiemarkeder</div>`;
-  html+=`<div class="g3">`;
-  html+=renderRegion("USA","🇺🇸",m.us,"S&P 500 · Nasdaq · Dow");
-  html+=renderRegion("Europa","🇪🇺",m.eu,"DAX · FTSE · CAC");
-  html+=renderRegion("Asien","🌏",m.asia,"Nikkei · Hang Seng");
-  html+=`</div>`;
+  // ③ Pulse (4 nøgletal)
+  h+=renderPulse(m,fg);
 
-  html+=`<div class="sec-label">Sektorrotation — hvor bevæger pengene sig?</div>`;
-  html+=renderSectors(m.sectors);
+  // ④ Smart money signaler
+  h+=`<div class="sec">Smart money signaler denne uge</div>`;
+  h+=renderSignals(a);
 
-  html+=`<div class="sec-label">Råvarer · Valuta · Futures</div>`;
-  html+=`<div class="g3">`;
-  html+=renderRegion("Råvarer","⛏️",m.commodities,"Guld · Olie · Gas");
-  html+=renderRegion("Valuta (Forex)","💱",Object.fromEntries(Object.entries(m.forex||{}).filter(([k])=>k!=="DXY")),"EUR · GBP · JPY");
-  html+=renderRegion("Futures (pre-market)","⚡",m.futures,"Viser retning inden markedet åbner");
-  html+=`</div>`;
+  // ⑤ Globale markeder
+  h+=`<div class="sec">Globale aktiemarkeder</div>`;
+  h+=`<div class="g3">`;
+  h+=renderRegion("USA","🇺🇸",m.us,"S&P 500 · Nasdaq · Dow");
+  h+=renderRegion("Europa","🇪🇺",m.eu,"DAX · FTSE · CAC");
+  h+=renderRegion("Asien","🌏",m.asia,"Nikkei · Hang Seng");
+  h+=`</div>`;
 
-  html+=`<div class="sec-label">Rentekurve & obligationer</div>`;
-  html+=`<div class="g2">`;
-  html+=renderYieldCurve(a.yield_curve);
-  html+=renderRegion("Renter","📋",m.bonds,"Hvad koster det at låne penge i USA?");
-  html+=`</div>`;
+  // ⑥ Sektorrotation
+  h+=`<div class="sec">Sektorrotation — hvor bevæger pengene sig?</div>`;
+  h+=renderSectors(m.sectors);
 
-  html+=`<div class="sec-label">Kryptomarkedet — top 12</div>`;
-  html+=`<div class="g2" style="margin-bottom:8px">`;
-  html+=`<div>`;
-  html+=renderBTCDom(dom);
-  html+=`</div>`;
-  html+=`<div style="font-size:12px;color:var(--dim);background:#fff;border:1px solid var(--border);border-radius:10px;padding:16px 20px;box-shadow:var(--shadow)">
-    <strong style="color:var(--text);font-size:13px">Hvad er BTC dominans?</strong><br><br>
-    Tænk på krypto-markedet som en kage. BTC dominans viser hvor stor en del Bitcoin er af den samlede kage.
-    <br><br>
-    <strong>Høj BTC dominans (>60%):</strong> Penge sidder sikkert i Bitcoin. Markedet er defensivt.<br><br>
-    <strong>Faldende BTC dominans:</strong> Penge roterer ud i altcoins — spekulativ stemning, typisk bullish for ETH og altcoins.<br><br>
-    <strong>Stigende BTC dominans under fald:</strong> Altcoins sælges hårdere end BTC — flight to safety inden for krypto.
-  </div>`;
-  html+=`</div>`;
-  html+=renderCrypto(c);
+  // ⑦ Råvarer + Valuta + Futures
+  h+=`<div class="sec">Råvarer · Valuta · Futures</div>`;
+  h+=`<div class="g3">`;
+  h+=renderRegion("Råvarer","⛏️",m.commodities,"Guld · Olie · Gas");
+  h+=renderRegion("Valuta (Forex)","💱",Object.fromEntries(Object.entries(m.forex||{}).filter(([k])=>k!=="DXY")),"EUR · GBP · JPY");
+  h+=renderRegion("Equity Futures","⚡",m.futures,"Retning inden markedet åbner");
+  h+=`</div>`;
 
-  html+=`<div class="sec-label">Ugens vigtige begivenheder (Ekonomisk kalender)</div>`;
-  html+=renderCalendar(cal);
+  // ⑧ Rentekurve + Renter
+  h+=`<div class="sec">Rentekurve & obligationer</div>`;
+  h+=`<div class="g2">`;
+  h+=renderYC(a.yield_curve);
+  h+=renderRegion("Renter","📋",m.bonds,"USA 2Y · 10Y · 30Y");
+  h+=`</div>`;
 
-  html+=`<div class="sec-label" style="margin-top:18px">Insider-handler — hvad ved de selv noget om?</div>`;
-  html+=renderInsider(ins);
+  // ⑨ Krypto
+  h+=`<div class="sec">Kryptomarkedet — top 12</div>`;
+  h+=`<div class="g2" style="margin-bottom:8px">`;
+  h+=`<div>${renderDom(dom)}</div>`;
+  h+=`<div style="font-size:12px;color:var(--dim);background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px 18px;box-shadow:var(--shadow)"><strong style="color:var(--text);font-size:13px">Hvad er BTC dominans?</strong><br><br>Høj BTC dominans (>60%): Penge sidder sikkert i Bitcoin — defensivt.<br><br>Faldende dominans: Kapital roterer til altcoins — spekulativ stemning.<br><br>BTC dominans stiger under fald: Altcoins sælges hårdere — flight to safety inden for krypto.</div>`;
+  h+=`</div>`;
+  h+=renderCrypto(c);
 
-  html+=`<div class="footer">
-    MarketPulse &nbsp;·&nbsp; Data: Yahoo Finance, CoinGecko, OpenInsider, ForexFactory
-    &nbsp;·&nbsp; <em>Kun til informationsformål — ikke investeringsrådgivning</em>
-  </div>`;
+  // ⑩ Kalender
+  h+=`<div class="sec">Vigtige begivenheder denne uge</div>`;
+  h+=`<div class="info-box"><strong>Kommende markedsbevægende begivenheder.</strong> 🔴 = høj impact (Fed, CPI, jobs). 🟡 = medium. Institutioner positionerer sig <em>inden</em> disse tal — kend dem.</div>`;
+  h+=renderCalendar(cal);
 
-  document.getElementById("root").innerHTML=html;
+  // ⑪ Insider handler
+  h+=`<div class="sec">Insider-handler — hvad ved de selv noget om?</div>`;
+  h+=renderInsider(ins);
+
+  h+=`<div class="footer">MarketPulse &nbsp;·&nbsp; Data: Yahoo Finance, CoinGecko, OpenInsider, ForexFactory &nbsp;·&nbsp; <em>Kun til informationsformål — ikke investeringsrådgivning</em></div>`;
+
+  document.getElementById("root").innerHTML=h;
   document.getElementById("upd").innerHTML=`<span class="live"></span>Sidst opdateret: ${data.updated}`;
 }
 
-/* ─── Fetch ─── */
+/* ── Fetch ── */
 async function loadData(){
   document.getElementById("upd").innerHTML=`Henter data...`;
   try{
     const r=await fetch("/api/data");
-    if(!r.ok) throw new Error("HTTP "+r.status);
+    if(!r.ok)throw new Error("HTTP "+r.status);
     renderAll(await r.json());
   }catch(e){
     document.getElementById("root").innerHTML=`<div style="text-align:center;padding:60px;color:var(--red)">
@@ -625,11 +577,9 @@ async function loadData(){
       <div style="font-size:12px;color:var(--dim);margin-top:6px">${e.message}</div>
       <button class="btn" style="margin-top:16px" onclick="loadData()">Prøv igen</button>
     </div>`;
-    document.getElementById("upd").innerHTML="Fejl ved datahentning";
+    document.getElementById("upd").innerHTML="Fejl";
   }
 }
-
-loadData();
 </script>
 </body>
 </html>
